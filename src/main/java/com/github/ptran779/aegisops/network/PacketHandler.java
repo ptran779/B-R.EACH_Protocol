@@ -2,6 +2,12 @@ package com.github.ptran779.aegisops.network;
 
 import com.github.ptran779.aegisops.AegisOps;
 import com.github.ptran779.aegisops.network.ml_packet.*;
+import com.github.ptran779.aegisops.network.Agent.*;
+import com.github.ptran779.aegisops.network.player.CameraModePacket;
+import com.github.ptran779.aegisops.network.player.KeyBindPacket;
+import com.github.ptran779.aegisops.network.player.serverConfigPacket;
+import com.github.ptran779.aegisops.network.render.EntityRenderPacket;
+import com.github.ptran779.aegisops.network.render.StructureRenderPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
@@ -16,6 +22,8 @@ public class PacketHandler {
     CHANNELS.registerMessage(id++, AgentSpecialPacket.class, AgentSpecialPacket::encode, AgentSpecialPacket::decode, AgentSpecialPacket::handle);
     CHANNELS.registerMessage(id++, AgentFollowPacket.class, AgentFollowPacket::encode, AgentFollowPacket::decode, AgentFollowPacket::handle);
     CHANNELS.registerMessage(id++, AgentHostilePacket.class, AgentHostilePacket::encode, AgentHostilePacket::decode, AgentHostilePacket::handle);
+    CHANNELS.registerMessage(id++, ChangeSkinPacket.class, ChangeSkinPacket::encode, ChangeSkinPacket::decode, ChangeSkinPacket::handle);
+
     CHANNELS.registerMessage(id++, CameraModePacket.class, CameraModePacket::encode, CameraModePacket::decode, CameraModePacket::handle);
     CHANNELS.registerMessage(id++, EntityRenderPacket.class, EntityRenderPacket::encode, EntityRenderPacket::decode, EntityRenderPacket::handle);
     CHANNELS.registerMessage(id++, StructureRenderPacket.class, StructureRenderPacket::encode, StructureRenderPacket::decode, StructureRenderPacket::handle);
@@ -34,5 +42,7 @@ public class PacketHandler {
     CHANNELS.registerMessage(id++, TrainBrainChip.class, TrainBrainChip::encode, TrainBrainChip::decode, TrainBrainChip::handle);
     CHANNELS.registerMessage(id++, TrainDone.class, TrainDone::encode, TrainDone::decode, TrainDone::handle);
     CHANNELS.registerMessage(id++, CommitTrainModel.class, CommitTrainModel::encode, CommitTrainModel::decode, CommitTrainModel::handle);
+    CHANNELS.registerMessage(id++, KeyBindPacket.class, KeyBindPacket::encode, KeyBindPacket::decode, KeyBindPacket::handle);
+    CHANNELS.registerMessage(id++, serverConfigPacket.class, serverConfigPacket::encode, serverConfigPacket::decode, serverConfigPacket::handle);
   }
 }

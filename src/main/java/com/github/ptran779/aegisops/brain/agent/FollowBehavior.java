@@ -1,5 +1,6 @@
 package com.github.ptran779.aegisops.brain.agent;
 
+import com.github.ptran779.aegisops.Utils;
 import com.github.ptran779.aegisops.brain.api.Behavior;
 import com.github.ptran779.aegisops.entity.agent.AbstractAgentEntity;
 import net.minecraft.server.level.ServerLevel;
@@ -23,7 +24,7 @@ public class FollowBehavior extends Behavior {
 
   @Override
   public boolean canUse() {
-    if(!(agent.getMovement() == 2) || agent.followPlayer == null) return false;
+    if(!(agent.getFollowMode() == Utils.FollowMode.FOLLOW) || agent.followPlayer == null) return false;
     this.followTarget = ((ServerLevel) agent.level()).getServer().getPlayerList().getPlayer(agent.followPlayer);
     if (followTarget == null) return false;
     double dist = agent.distanceToSqr(followTarget);
@@ -32,7 +33,7 @@ public class FollowBehavior extends Behavior {
 
   @Override
   public boolean run() {
-    if ((agent.getMovement() == 2) && followTarget != null && followTarget.isAlive()) {
+    if ((agent.getFollowMode() == Utils.FollowMode.FOLLOW) && followTarget != null && followTarget.isAlive()) {
       double dist = agent.distanceToSqr(followTarget);
       if (maxDistance*maxDistance > dist && dist > targetDistance*targetDistance) {
         agent.moveto(followTarget, agent.getAttribute(Attributes.MOVEMENT_SPEED).getValue());

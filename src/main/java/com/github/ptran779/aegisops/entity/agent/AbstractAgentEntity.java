@@ -1,8 +1,9 @@
 package com.github.ptran779.aegisops.entity.agent;
 
-import com.github.ptran779.aegisops.config.SkinManager;
-import com.github.ptran779.aegisops.Utils;
 import com.github.ptran779.aegisops.client.animation.AnimationLibrary;
+import com.github.ptran779.aegisops.config.SkinManager;
+import com.github.ptran779.aegisops.config.AgentConfig;
+import com.github.ptran779.aegisops.Utils;
 import com.github.ptran779.aegisops.entity.inventory.AgentInventory;
 import com.github.ptran779.aegisops.entity.inventory.AgentInventoryMenu;
 import com.github.ptran779.aegisops.entity.api.IEntityRender;
@@ -11,7 +12,7 @@ import com.github.ptran779.aegisops.entity.api.IEntityTeam;
 import com.github.ptran779.aegisops.goal.common.*;
 import com.github.ptran779.aegisops.goal.special.RechargeVirtualAmmo;
 import com.github.ptran779.aegisops.item.BrainChipItem;
-import com.github.ptran779.aegisops.network.EntityRenderPacket;
+import com.github.ptran779.aegisops.network.render.EntityRenderPacket;
 import com.github.ptran779.aegisops.network.PacketHandler;
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.entity.IGunOperator;
@@ -20,6 +21,7 @@ import com.tacz.guns.api.item.IAmmoBox;
 import com.tacz.guns.api.item.gun.AbstractGunItem;
 import com.tacz.guns.resource.index.CommonGunIndex;
 import com.tacz.guns.util.AttachmentDataUtils;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -55,11 +57,13 @@ import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.github.ptran779.aegisops.attribute.AgentAttribute.*;
+import static com.tacz.guns.api.item.nbt.GunItemDataAccessor.GUN_ID_TAG;
 
 public abstract class AbstractAgentEntity extends PathfinderMob implements InventoryCarrier, MenuProvider, IEntityTeam, IEntityTarget, IEntityRender {
   public String agentType = "Template";  // fixme use a method to get this. do static
@@ -75,7 +79,7 @@ public abstract class AbstractAgentEntity extends PathfinderMob implements Inven
   public final int specialSlot = 6;
 
   // agent custom config
-  private UUID bossUUID = null;
+//  private UUID bossUUID = null;
   public UUID followPlayer = null;
   public int maxfood = 40;
   private int pathCooldown = 0;
@@ -86,11 +90,12 @@ public abstract class AbstractAgentEntity extends PathfinderMob implements Inven
   private static final EntityDataAccessor<Integer> AUTO_HOSTILE_F = SynchedEntityData.defineId(AbstractAgentEntity.class, EntityDataSerializers.INT);
   public static final EntityDataAccessor<Boolean> KEEP_EAT_F = SynchedEntityData.defineId(AbstractAgentEntity.class, EntityDataSerializers.BOOLEAN);
   public static final EntityDataAccessor<Integer> FOOD_VALUE = SynchedEntityData.defineId(AbstractAgentEntity.class, EntityDataSerializers.INT);
-  private static final EntityDataAccessor<String> OWNER = SynchedEntityData.defineId(AbstractAgentEntity.class, EntityDataSerializers.STRING);
   private static final EntityDataAccessor<Integer> VIRTUAL_AMMO = SynchedEntityData.defineId(AbstractAgentEntity.class, EntityDataSerializers.INT);  // for render purpose
 
-  private static final EntityDataAccessor<Integer> ANI_MOVE = SynchedEntityData.defineId(AbstractAgentEntity.class, EntityDataSerializers.INT);  // for render purpose
+  private static final EntityDataAccessor<Optional<UUID>> BOSS_UUID = SynchedEntityData.defineId(AbstractAgentEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+//  private static final EntityDataAccessor<Integer> ANI_MOVE = SynchedEntityData.defineId(AbstractAgentEntity.class, EntityDataSerializers.INT);  // for render purpose
 
+  // Client stuff only part
   private static final EntityDataAccessor<Boolean> ANI_MOVE_STATE_CHANGE = SynchedEntityData.defineId(AbstractAgentEntity.class, EntityDataSerializers.BOOLEAN);  // for render purpose when animation has more than 1 option
   private static final EntityDataAccessor<Integer> ANI_MOVE_POSE_START = SynchedEntityData.defineId(AbstractAgentEntity.class, EntityDataSerializers.INT);
   private static final EntityDataAccessor<Integer> ANI_MOVE_POSE_END = SynchedEntityData.defineId(AbstractAgentEntity.class, EntityDataSerializers.INT);
@@ -102,11 +107,13 @@ public abstract class AbstractAgentEntity extends PathfinderMob implements Inven
   public static final EntityDataAccessor<String> SKIN = SynchedEntityData.defineId(AbstractAgentEntity.class, EntityDataSerializers.STRING);
   //skin quick lookup
   private transient ResourceLocation cachedSkin;
-
-  // animation -- client render only -- send packet to server to update when to play
   public float renderTimeTrigger = -1000;
-  public void resetRenderTick() {
-    renderTimeTrigger = tickCount;}
+  public void resetRenderTick() {renderTimeTrigger = tickCount;}
+  public void flushSkinCache() {cachedSkin = null;}  // flush for render
+  public ResourceLocation getResolvedSkin() {  // cache this for render. so O1 instead of hashmap
+    if (cachedSkin == null) {cachedSkin = SkinManager.get(getFemale(), getSkin());}
+    return cachedSkin;
+  }
 
   // for testing purpose, with transition, use both. with static, use start only
   public void setAniMoveTransition(int pStart, int pEnd, float tStart, float tEnd, float tTran) {
@@ -117,12 +124,10 @@ public abstract class AbstractAgentEntity extends PathfinderMob implements Inven
     entityData.set(ANI_MOVE_TIME_TRAN, tTran);
     entityData.set(ANI_MOVE_STATE_CHANGE, true);
   }
-
   public void setAniMoveStatic(int pStart) {
     entityData.set(ANI_MOVE_POSE_START, pStart);
     entityData.set(ANI_MOVE_STATE_CHANGE, false);
   }
-
   public int getAniMovePoseStart() {return entityData.get(ANI_MOVE_POSE_START);}
   public int getAniMovePoseEnd() {return entityData.get(ANI_MOVE_POSE_END);}
   public float getAniMoveTimeStart() {return entityData.get(ANI_MOVE_TIME_START);}
@@ -130,7 +135,8 @@ public abstract class AbstractAgentEntity extends PathfinderMob implements Inven
   public float getAniMoveTimeTran() {return entityData.get(ANI_MOVE_TIME_TRAN);}
 
   public boolean getAniMoveStateChange() {return this.entityData.get(ANI_MOVE_STATE_CHANGE);}
-  public void setAniMoveStateChange(boolean flag) {this.entityData.set(ANI_MOVE_STATE_CHANGE, flag);}
+//  public void setAniMoveStateChange(boolean flag) {this.entityData.set(ANI_MOVE_STATE_CHANGE, flag);}
+  // stop here
 
   public AbstractAgentEntity(EntityType<? extends AbstractAgentEntity> entityType, Level level) {
     super(entityType, level);
@@ -139,10 +145,6 @@ public abstract class AbstractAgentEntity extends PathfinderMob implements Inven
     setPersistenceRequired();  // do not despawn agent
     this.op = IGunOperator.fromLivingEntity(this);  // for gun
     this.setCanPickUpLoot(true);
-  }
-  public ResourceLocation getResolvedSkin() {
-    if (cachedSkin == null) {cachedSkin = SkinManager.get(this.entityData.get(FEMALE), this.entityData.get(SKIN));}
-    return cachedSkin;
   }
 
   public static AttributeSupplier.Builder createAttributes() {
@@ -161,7 +163,7 @@ public abstract class AbstractAgentEntity extends PathfinderMob implements Inven
     entityData.define(AUTO_HOSTILE_F, Utils.TargetMode.OFF.ordinal());
     entityData.define(KEEP_EAT_F, false);
     entityData.define(FOOD_VALUE, 0);
-    entityData.define(ANI_MOVE, Utils.AniMove.NORM.ordinal());
+//    entityData.define(ANI_MOVE, Utils.AniMove.NORM.ordinal());
 
     entityData.define(ANI_MOVE_STATE_CHANGE, false);
     entityData.define(ANI_MOVE_POSE_START, AnimationLibrary.A_LIVING);
@@ -172,19 +174,24 @@ public abstract class AbstractAgentEntity extends PathfinderMob implements Inven
 
     entityData.define(FEMALE, false);
     entityData.define(SKIN, "");
-    entityData.define(OWNER, "");
+    entityData.define(BOSS_UUID, Optional.empty());
     entityData.define(VIRTUAL_AMMO, 0);
   }
 
-  public String getOwner() {return this.entityData.get(OWNER);}
-  public void setOwner(String boss) {this.entityData.set(OWNER, boss);}
+  public String getOwner() {
+    UUID bossUUID = getBossUUID();
+    if (bossUUID == null) return "";
+    Player boss = this.level().getPlayerByUUID(bossUUID);
+    if (boss == null) return "";
+    return boss.getGameProfile().getName();
+  }
 
-  public UUID getBossUUID() {return this.bossUUID;}
+  public UUID getBossUUID() {
+    return this.entityData.get(BOSS_UUID).orElse(null);
+  }
   public void setBossUUID(UUID uuid) {
-    this.bossUUID = uuid;
-    Player boss = this.level().getServer().getPlayerList().getPlayer(uuid);
-    if (boss != null) {setOwner(boss.getGameProfile().getName());
-    } else {setOwner("");}
+    if (uuid == null) {this.entityData.set(BOSS_UUID, Optional.empty());}
+    else {this.entityData.set(BOSS_UUID, Optional.of(uuid));}
   }
 
   public boolean getAllowSpecial() {return this.entityData.get(ALLOW_SPECIAL_F);}
@@ -192,10 +199,12 @@ public abstract class AbstractAgentEntity extends PathfinderMob implements Inven
   public boolean getKeepEating() {return this.entityData.get(KEEP_EAT_F);}
   public void setKeepEating(boolean flag) {this.entityData.set(KEEP_EAT_F, flag);}
   //0: wander, 1: stand guard, 2: follow, 3(wip) patrol
-  public int getMovement() {return this.entityData.get(MOVEMENT_F);}
-  public void setMovement(int flag, UUID player) {
-    this.entityData.set(MOVEMENT_F, flag);
-    this.followPlayer = getMovement() == 2 ? player : null;
+//  public int getMovement() {return ;}  /// fix me you half bake code
+  public Utils.FollowMode getFollowMode() {return Utils.FollowMode.fromId(this.entityData.get(MOVEMENT_F));}
+  public Utils.FollowMode nextFollowMode() {return Utils.FollowMode.nextFollowMode(this.entityData.get(MOVEMENT_F));}
+  public void setFollowMode(Utils.FollowMode mode, UUID player) {
+    this.entityData.set(MOVEMENT_F, mode.ordinal());
+    this.followPlayer = getFollowMode() == Utils.FollowMode.FOLLOW ? player : null;
   }
   public Utils.TargetMode getTargetMode() {return Utils.TargetMode.fromId(this.entityData.get(AUTO_HOSTILE_F));}
   public void setTargetMode(Utils.TargetMode mode) {this.entityData.set(AUTO_HOSTILE_F, mode.ordinal());}
@@ -208,13 +217,18 @@ public abstract class AbstractAgentEntity extends PathfinderMob implements Inven
   public void setFood(Integer val) {this.entityData.set(FOOD_VALUE, val);}
   public boolean getFemale() {return this.entityData.get(FEMALE);}
   public void setFemale(boolean flag) {this.entityData.set(FEMALE, flag);}
+  public String getSkin() {return this.entityData.get(SKIN);}
+  public void setSkin(String skin) {this.entityData.set(SKIN, skin);}
+//  public Utils.AniMove getAniMove() {return Utils.AniMove.fromId(this.entityData.get(ANI_MOVE));}
 
-  public void setAniMove(Utils.AniMove move) {this.entityData.set(ANI_MOVE, move.ordinal());}
+//  public void setAniMove(Utils.AniMove move) {this.entityData.set(ANI_MOVE, move.ordinal());}
 
-  /// Combat -- why is it here again?
+  public abstract AgentConfig getAgentConfig();
+
+  /// Combat
   public boolean shootGun(boolean precision){   ///  true = long reload, false = just compute cooldown,
     // check for friendly on line. else dont shoot and just move to cooldown
-//    if (Utils.hasFriendlyInLineOfFire(this, getTarget())) {return false;}
+    if (Utils.hasFriendlyInLineOfFire(this, getTarget())) {return false;}
 
     prepAttack();
     if (op.getSynIsBolting()) {op.aim(false);}
@@ -309,17 +323,16 @@ public abstract class AbstractAgentEntity extends PathfinderMob implements Inven
           };
           player.displayClientMessage(Component.literal(disp), true);
         } else if (player.isCrouching()) {
-          int i = this.getMovement() == 2 ? 0 : this.getMovement() + 1;
-          this.setMovement(i, getBossUUID());
-          String disp = switch (i) {
-            case 0 -> this.getName().getString() + " will wander around here";
-            case 1 -> this.getName().getString() + " will stand guard";
-            case 2 -> {
+          Utils.FollowMode mode = nextFollowMode();
+          setFollowMode(mode, player.getUUID());
+          String disp = switch (mode) {
+            case WANDER -> this.getName().getString() + " will wander around here";
+            case STAY -> this.getName().getString() + " will stand guard";
+            case FOLLOW -> {
               Entity target = ((ServerLevel) level()).getEntity(this.followPlayer);
               String name = target != null ? target.getName().getString() : "???";
               yield this.getName().getString() + " will follow " + name;
             }
-            default -> "";
           };
           player.displayClientMessage(Component.literal(disp), true);
         } else {
@@ -467,9 +480,9 @@ public abstract class AbstractAgentEntity extends PathfinderMob implements Inven
     nbt.putBoolean("allow_special", this.getAllowSpecial());
     nbt.putInt("auto_hostile", this.entityData.get(AUTO_HOSTILE_F));
     nbt.putBoolean("is_female", getFemale());
-    nbt.putString("skin", this.entityData.get(SKIN));
+    nbt.putString("skin",getSkin());
 //    nbt.putBoolean("attack_player", this.getAttackPlayer());
-    nbt.putInt("movement", this.getMovement());
+    nbt.putInt("movement", this.entityData.get(MOVEMENT_F));
     nbt.putInt("virtual_ammo", this.getVirtualAmmo());
   }
   public void readAdditionalSaveData(CompoundTag nbt) {
@@ -491,17 +504,18 @@ public abstract class AbstractAgentEntity extends PathfinderMob implements Inven
     this.setAllowSpecial(nbt.getBoolean("allow_special"));
     this.setTargetMode(Utils.TargetMode.values()[nbt.getInt("auto_hostile")]);
     setFemale(nbt.getBoolean("is_female"));
-    this.entityData.set(SKIN, nbt.getString("skin"));
+    setSkin(nbt.getString("skin"));
 //    this.setAttackPlayer(nbt.getBoolean("attack_player"));
-    this.setMovement(nbt.getInt("movement"), this.getBossUUID());
+    this.setFollowMode(Utils.FollowMode.values()[nbt.getInt("movement")], this.getBossUUID());
     this.setVirtualAmmo(nbt.getInt("virtual_ammo"));
+    this.setItemSlot(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
   }
 
   public void initCosmetic(){
     boolean isFemale = ThreadLocalRandom.current().nextBoolean();
     this.setCustomName(Component.literal(Utils.randomName(isFemale)));
     setFemale(isFemale);
-    this.entityData.set(SKIN, SkinManager.renerateRandom(isFemale));
+    setSkin(isFemale ? Utils.makeSafeSkinName(getAgentConfig().defaultFemaleSkin) : Utils.makeSafeSkinName(getAgentConfig().defaultMaleSkin));
   }
   public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData, @Nullable CompoundTag dataTag) {
     SpawnGroupData data = super.finalizeSpawn(level, difficulty, reason, spawnData, dataTag);
@@ -510,7 +524,7 @@ public abstract class AbstractAgentEntity extends PathfinderMob implements Inven
       boolean isFemale = ThreadLocalRandom.current().nextBoolean();
       this.setCustomName(Component.literal(Utils.randomName(isFemale)));
       setFemale(isFemale);
-      this.entityData.set(SKIN, SkinManager.renerateRandom(isFemale));
+      setSkin(isFemale ? Utils.makeSafeSkinName(getAgentConfig().defaultFemaleSkin) : Utils.makeSafeSkinName(getAgentConfig().defaultMaleSkin));
     }
     return data;
   }
@@ -590,11 +604,19 @@ public abstract class AbstractAgentEntity extends PathfinderMob implements Inven
   public ItemStack getGunSlot(){return inventory.getItem(gunSlot);}
 
   // for overwrite later in final class
-  public boolean isEquipableGun(ItemStack stack) {return false;}
-  public boolean isEquipableMelee(ItemStack stack) {return false;}
-  public int getMaxVirtualAmmo(){return 0;}
-  public int getAmmoPerCharge(){return 1;}
-
+  public boolean isEquipableGun(ItemStack stack) {
+    CompoundTag nbt = stack.getOrCreateTag();
+    String gunId = nbt.getString(GUN_ID_TAG);
+    if (gunId.isEmpty()) return false;
+    return getAgentConfig().allowGuns.contains(gunId);
+  }
+  public boolean isEquipableMelee(ItemStack stack) {
+    if (stack.isEmpty()) return false;
+    return (getAgentConfig().allowMelees.contains(BuiltInRegistries.ITEM.getKey(stack.getItem()).toString()) ||
+        stack.getTags().anyMatch(tagKey -> getAgentConfig().allowMelees.contains("#" + tagKey.location())));
+  }
+  public int getMaxVirtualAmmo(){return getAgentConfig().maxVirtualAmmo;}
+  public int getAmmoPerCharge(){return getAgentConfig().chargePerAmmo;}
   public int getSensorSize(){return 1;}
   public int getBehaviorSize(){return 1;}
 }

@@ -5,6 +5,7 @@ import net.minecraft.client.animation.AnimationDefinition;
 import java.util.ArrayList;
 import java.util.List;
 
+// need to split to client / server safety fixme
 public class AnimationLibrary {
   public static final List<AnimationDefinition> AGENT_ANI = new ArrayList<>();
   // negative registration for composite custom? mostly related to living animation

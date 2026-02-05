@@ -45,7 +45,6 @@ public class AgentEntityRender extends HumanoidMobRenderer<AbstractAgentEntity, 
 
     //attack ani
     float aniTime = (agent.tickCount - agent.renderTimeTrigger + partialTicks)/20f;
-//    int aniMove = agent.getAniMove();
 
     // based animation
     if (agent.getAniMoveStateChange()){
@@ -86,114 +85,6 @@ public class AgentEntityRender extends HumanoidMobRenderer<AbstractAgentEntity, 
         );
       }
     }
-//    } else if (aniMove == Utils.AniMove.SPECIAL) {
-//      if (agent instanceof Engineer) {
-//        if (agent.getAniMoveAdvance() == 0) {
-//          animateHumanoid(model, AgentLivingAnimation.BONK, model.BONE_PARTS, aniTick / 20f, 1, false);
-//        }
-//      }
-//      else if (agent instanceof Medic) {
-//        switch (agent.getAniMoveAdvance()){
-//          case 0: {
-//            animateHumanoid(model, AgentLivingAnimation.MEDIC_BANDAGE, model.BONE_PARTS, aniTick / 20f, 1, false);
-//            break;
-//          }
-//          case 1: {
-//            animateHumanoid(model, AgentLivingAnimation.MEDIC_SYRINGE, model.BONE_PARTS, aniTick / 20f, 1, false);
-//            break;
-//          }
-//        }
-//      }
-//      else if (agent instanceof Sniper) {
-//        if (agent.getAniMoveAdvance() == 0) {
-//          animateHumanoid(model, AgentLivingAnimation.PRECISION_SHOT, model.BONE_PARTS, aniTick / 20f, 1, false);
-//        }
-//      }
-//      else if (agent instanceof Heavy) {
-//        switch (agent.getAniMoveAdvance()) {
-//          case 0: {
-//            animateHumanoid(model, AgentSpecialAnimation.SHIELD_DEPLOY, model.BONE_PARTS, aniTick / 20f, 1, false);
-//            break;
-//          }
-//          case 1: {
-//            animateHumanoid(model, AgentSpecialAnimation.SHIELD_CHARGE, model.BONE_PARTS, aniTick / 20f, 1, true);
-//            break;
-//          }
-//          case 2: {
-//            animateHumanoid(model, AgentSpecialAnimation.SHIELD_HOLD, model.BONE_PARTS, aniTick / 20f, 1, false);
-//            break;
-//          }
-//          case 3: {
-//            animateHumanoid(model, AgentSpecialAnimation.SHIELD_BONK, model.BONE_PARTS, aniTick / 20f, 1, false);
-//            break;
-//          }
-//          case 4: {
-//            animateHumanoid(model, AgentSpecialAnimation.SHIELD_RECOVER, model.BONE_PARTS, aniTick / 20f, 1, false);
-//            break;
-//          }
-//          case 5: {
-//            animateHumanoid(model, AgentSpecialAnimation.SHIELD_GUN_BURST, model.BONE_PARTS, aniTick / 20f, 1, false);
-//            break;
-//          }
-//          default: {
-//            break;
-//          }
-//        }
-//      }
-//      else if (agent instanceof Soldier) {
-//        if (agent.getAniMoveAdvance() == 0) {
-//          animateHumanoid(model, AgentSpecialAnimation.SODIER_HYPE, model.BONE_PARTS, aniTick / 20f, 1, false);
-//        }
-//      }
-//      else if (agent instanceof Demolition) {
-//        switch (agent.getAniMoveAdvance()) {
-//          case 0:{
-//            animateHumanoid(model, AgentSpecialAnimation.GRENADE_THROW, model.BONE_PARTS, aniTick / 20f, 1, false);
-//            break;
-//          }
-//          case 1: {
-//            animateHumanoid(model, AgentSpecialAnimation.TERMINAL_ACTIVATE, model.BONE_PARTS, aniTick / 20f, 1, false);
-//            break;
-//          }
-//        }
-//      }
-//    } else if (aniMove == Utils.AniMove.SALUTE) {
-//      animateHumanoid(model, AgentLivingAnimation.SALUTE, model.BONE_PARTS, aniTick / 20f, 1, false);
-//    } else if (aniMove == Utils.AniMove.DISP_RELOAD) {
-//      animateHumanoid(model, AgentLivingAnimation.STATION_RELOAD, model.BONE_PARTS, aniTick / 20f, 1, false);
-//    } else if (aniMove == Utils.AniMove.ATTACK) {
-//      animateHumanoid(model, AgentLivingAnimation.TRIPLE_STRIKE, model.BONE_PARTS, aniTick / 20f, 1, false);
-//    } else {  // normal living animation
-//      double speed = agent.getDeltaMovement().horizontalDistanceSqr(); // X² + Z²
-//      if (speed > 0.015) {
-//        animateHumanoid(model, AgentLivingAnimation.RUN, model.BONE_PARTS, (agent.tickCount + partialTicks) / 20f, 1, true);
-//      } else if (speed > 0.001) {
-//        animateHumanoid(model, AgentLivingAnimation.WALK, model.BONE_PARTS, (agent.tickCount + partialTicks) / 20f, 1, true);
-//      } else {
-//        animateHumanoid(model,AgentLivingAnimation.IDLE, model.BONE_PARTS, (agent.tickCount + partialTicks) / 20f, 1, true);
-//      }
-//
-//      //composite -- mostly what to do about hand
-//      if (agent.getAniMove() == Utils.AniMove.RELOAD && aniTick < 20 * AgentLivingAnimation.RELOAD.lengthInSeconds()){
-//        // strict impose
-//        model.leftArm.resetPose();
-//        model.rightArm.resetPose();
-//        animateHumanoid(model, AgentLivingAnimation.RELOAD, model.BONE_PARTS, aniTick / 20f, 1, false);
-//      } else if (agent.getMainHandItem().getItem() instanceof ModernKineticGunItem) {
-//        model.rightArm.yRot = model.head.yRot;
-//        model.leftArm.yRot = 0.5F + model.head.yRot;
-//        // tilt correction
-//        model.rightArm.xRot = (-(float)Math.PI / 2F) + model.head.xRot;
-//        model.leftArm.xRot = (-(float)Math.PI / 2F) + model.head.xRot;
-//
-//        // Copy to sleeves
-//        model.leftSleeve.copyFrom(model.leftArm);
-//        model.rightSleeve.copyFrom(model.rightArm);
-//      } else if (agent.isUsingItem() && (agent.getUseItem().getUseAnimation() == UseAnim.EAT || agent.getUseItem().getUseAnimation() == UseAnim.DRINK)) {
-//        animateHumanoid(model, AgentLivingAnimation.EATING, model.BONE_PARTS, aniTick / 20f, 1, true);
-//      }
-//    }
-    // sleeve fix
 
     // render head looking
     float headYaw = Mth.rotLerp(partialTicks, agent.yHeadRotO, agent.yHeadRot) - agent.yBodyRot;

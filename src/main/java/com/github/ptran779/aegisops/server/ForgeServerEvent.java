@@ -4,6 +4,8 @@ import com.github.ptran779.aegisops.brain.ml.ML;
 import com.github.ptran779.aegisops.config.MlModelManager;
 import com.github.ptran779.aegisops.config.ServerConfig;
 import com.github.ptran779.aegisops.config.SkinManager;
+import com.github.ptran779.aegisops.config.ServerConfig;
+import com.github.ptran779.aegisops.config.SkinManager;
 import com.github.ptran779.aegisops.Utils;
 import com.github.ptran779.aegisops.brain.api.BrainServer;
 import com.github.ptran779.aegisops.entity.extra.FallingHellPod;
@@ -11,18 +13,27 @@ import com.github.ptran779.aegisops.network.CameraModePacket;
 import com.github.ptran779.aegisops.network.PacketHandler;
 import com.github.ptran779.aegisops.network.ml_packet.PushDatLog;
 import com.github.ptran779.aegisops.network.ml_packet.TrainDone;
+import com.github.ptran779.aegisops.network.player.CameraModePacket;
+import com.github.ptran779.aegisops.network.player.serverConfigPacket;
+import com.github.ptran779.aegisops.player.TaticalCommandProvider;
+import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import com.github.ptran779.aegisops.AegisOps;
 import com.github.ptran779.aegisops.config.AgentConfigManager;
@@ -124,9 +135,21 @@ public class ForgeServerEvent {
   @SubscribeEvent
   public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
     Player player = event.getEntity();
+    // sync server config so everyone has the same copy of agent config
+    if (player instanceof ServerPlayer serverPlayer) {
+      // Get the "Long String" from your manager
+      String json = AgentConfigManager.getSyncPayload();
+
+      // Send the packet (using your channel instance name 'CHANNELS')
+      CHANNELS.send(
+          PacketDistributor.PLAYER.with(() -> serverPlayer),
+          new serverConfigPacket(json) // Or S2CAgentConfigSyncPacket, whatever you named it
+      );
+    }
+
+    // 1st time joining get to be delivered in a hell pod :)
     CompoundTag persistentData = player.getPersistentData();
     CompoundTag data;
-
     if (!persistentData.contains(Player.PERSISTED_NBT_TAG)) {
       data = new CompoundTag();
       persistentData.put(Player.PERSISTED_NBT_TAG, data);
@@ -146,5 +169,29 @@ public class ForgeServerEvent {
       player.startRiding(pod, true);
       CHANNELS.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) player), new CameraModePacket());
     }
+  }
+
+  // Capabilities stuff
+  @SubscribeEvent
+  public static void onAttachCapabilitiesPlayer(AttachCapabilitiesEvent<Entity> event) {
+    if(event.getObject() instanceof Player) {
+      if(!event.getObject().getCapability(TaticalCommandProvider.TATICAL_COMMAND_CAPABILITY).isPresent()) {
+        event.addCapability(new ResourceLocation(AegisOps.MOD_ID, "properties"), new TaticalCommandProvider());
+      }
+    }
+  }
+  @SubscribeEvent
+  public static void onPlayerCloned(PlayerEvent.Clone event) {
+    if(event.isWasDeath()){
+      event.getOriginal().getCapability(TaticalCommandProvider.TATICAL_COMMAND_CAPABILITY).ifPresent(oldStore -> {
+        event.getOriginal().getCapability(TaticalCommandProvider.TATICAL_COMMAND_CAPABILITY).ifPresent(newStore -> {
+          newStore.copyFrom(oldStore);
+        });
+      });
+    }
+  }
+  @SubscribeEvent
+  public static void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
+    event.register(TaticalCommandProvider.class);
   }
 }

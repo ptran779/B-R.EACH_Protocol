@@ -15,8 +15,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
+import java.text.Normalizer;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 
@@ -89,6 +91,23 @@ public class Utils {
     }
   }
 
+  public enum FollowMode {
+    WANDER,     // Move around randomly
+    STAY,       // Stay in place
+    FOLLOW;     // Follow the owner/player
+
+    public static final FollowMode[] VALUES = values();
+
+    public static FollowMode fromId(int id) {
+      return VALUES[id];
+    }
+
+    public static FollowMode nextFollowMode(int id) {
+      int next = (id + 1) % VALUES.length;
+      return VALUES[next];
+    }
+  }
+
   public enum AniMove {
     NORM, ATTACK, RELOAD, DISP_RELOAD, SALUTE, SPECIAL, RECOVER;
 //    NORM, ATTACK, RELOAD, DISP_RELOAD, SALUTE, SPECIAL0, SPECIAL1, SPECIAL2, SPECIAL3;
@@ -98,7 +117,6 @@ public class Utils {
       return VALUES[id];
     }
   }
-
 
   public static <U extends Entity, T extends Entity> T findNearestEntity(U user, Class<T> type, double radius, Predicate<T> func) {
     AABB box = user.getBoundingBox().inflate(radius);
@@ -123,5 +141,35 @@ public class Utils {
             other.getBoundingBox().clip(start, end).isPresent()
     );
     return !teammates.isEmpty();
+  }
+
+  //use for both client and server to help with setting default skin
+  public static String makeSafeSkinName(String rawFileName) {
+    if (rawFileName == null || rawFileName.isEmpty()) return "skin_default";
+
+    // 1. Strip extension if present
+    int dotIndex = rawFileName.lastIndexOf('.');
+    String base = (dotIndex > 0 ? rawFileName.substring(0, dotIndex) : rawFileName);
+
+    // 2. Lowercase
+    base = base.toLowerCase(Locale.ROOT);
+
+    // 3. Normalize Unicode → ASCII
+    base = Normalizer.normalize(base, Normalizer.Form.NFKD)
+        .replaceAll("\\p{M}", ""); // removes diacritics
+
+    // 4. Replace illegal ResourceLocation characters with _
+    base = base.replaceAll("[^a-z0-9._-]", "_");
+
+    // 5. Collapse multiple underscores and trim edges
+    base = base.replaceAll("_+", "_")
+        .replaceAll("^_|_$", "");
+
+    // 6. Fallback if empty after cleaning
+    if (base.isEmpty()) base = "skin";
+
+    // 7. Append short hash to avoid collisions
+    String hash = Integer.toHexString(rawFileName.hashCode());
+    return base + "_" + hash;
   }
 }

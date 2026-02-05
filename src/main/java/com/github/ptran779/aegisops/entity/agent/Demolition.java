@@ -1,6 +1,8 @@
 package com.github.ptran779.aegisops.entity.agent;
 
 import com.github.ptran779.aegisops.config.AgentConfig;
+import com.github.ptran779.aegisops.Utils;
+import com.github.ptran779.aegisops.config.AgentConfig;
 import com.github.ptran779.aegisops.goal.common.AgentAttackGoal;
 import com.github.ptran779.aegisops.goal.common.CustomRangeTargetGoal;
 import com.github.ptran779.aegisops.goal.common.CustomRetaliationTargetGoal;
@@ -26,10 +28,6 @@ public class Demolition extends AbstractAgentEntity {
         this.agentType = "Demolition";
     }
 
-    public void readAdditionalSaveData(CompoundTag tag) {
-        super.readAdditionalSaveData(tag);
-        this.setItemSlot(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
-    }
     protected void registerGoals() {
         super.registerGoals();
         this.goalSelector.addGoal(2, new DeployVPGoal(this, 100, 300));
@@ -38,16 +36,9 @@ public class Demolition extends AbstractAgentEntity {
         this.goalSelector.addGoal(4, new CustomRangeTargetGoal<>(this, LivingEntity.class, 30, 32, 48, true, entity -> this.shouldTargetEntity(this, (LivingEntity) entity)));
         this.goalSelector.addGoal(3, new AgentAttackGoal(this, 4, 8, 32));
     }
-    public void tick() {
-        super.tick();
-    }
 
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor worldIn, DifficultyInstance difficultyIn, MobSpawnType reason, @Nullable SpawnGroupData spawnDataIn, @Nullable CompoundTag dataTag) {
-        return super.finalizeSpawn(worldIn, difficultyIn, reason, spawnDataIn, dataTag);
-    }
-
-    public static void updateClassConfig(@Nonnull AgentConfig config) {
-      Demolition.config = config;}
+    public static void updateClassConfig(@Nonnull AgentConfig config) {Demolition.config = config;}
+    public AgentConfig getAgentConfig() {return config;}
 
     @Override
     public boolean isEquipableGun(ItemStack stack) {

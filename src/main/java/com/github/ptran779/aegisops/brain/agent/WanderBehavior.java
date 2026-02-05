@@ -1,5 +1,6 @@
 package com.github.ptran779.aegisops.brain.agent;
 
+import com.github.ptran779.aegisops.Utils;
 import com.github.ptran779.aegisops.brain.api.ThrottleBehavior;
 import com.github.ptran779.aegisops.entity.agent.AbstractAgentEntity;
 import net.minecraft.world.entity.ai.util.DefaultRandomPos;
@@ -16,7 +17,7 @@ public class WanderBehavior extends ThrottleBehavior {
 
   @Override
   public boolean canUse() {
-    return super.canUse() && agent.getMovement()==0;
+    return super.canUse() && agent.getFollowMode()== Utils.FollowMode.WANDER;
   }
 
   public void start(){
@@ -25,7 +26,7 @@ public class WanderBehavior extends ThrottleBehavior {
 
   @Override
   public boolean run() {
-    if (towards == null || agent.getMovement() != 0) {return true;}
+    if (towards == null || agent.getFollowMode() != Utils.FollowMode.WANDER) {return true;}
     return !agent.moveto(towards, 0.4);
   }
 }

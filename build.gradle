@@ -15,7 +15,7 @@ apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.20.1-1.4.0'
+version = '1.20.1-2.0.0Alpha'
 group = 'com.github.ptran779.aegisops'
 archivesBaseName = 'aegisops'
 
@@ -31,7 +31,7 @@ minecraft {
     runs {
         client {
             workingDirectory project.file('run')
-            jvmArgs '-Xmx4G'
+            jvmArg "-Xmx4G"
 
             property 'forge.logging.markers', 'REGISTRIES'
 
@@ -54,10 +54,14 @@ minecraft {
 
         server {
             workingDirectory project.file('run')
+            jvmArg "-Xmx4G"
 
             property 'forge.logging.markers', 'REGISTRIES'
 
             property 'forge.logging.console.level', 'debug'
+
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
 
             mods {
                 companions {

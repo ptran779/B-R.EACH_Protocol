@@ -1,7 +1,6 @@
 package com.github.ptran779.aegisops.entity.agent;
 
 import com.github.ptran779.aegisops.config.AgentConfig;
-import com.github.ptran779.aegisops.brain.agent.TestBrain;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -81,9 +80,6 @@ public class Swordman extends AbstractAgentEntity {
         return super.finalizeSpawn(worldIn, difficultyIn, reason, spawnDataIn, dataTag);
     }
 
-    public static void updateClassConfig(@Nonnull AgentConfig config) {
-      Swordman.config = config;}
-
     @Override
     public boolean isEquipableGun(ItemStack stack) {
         CompoundTag nbt = stack.getOrCreateTag();
@@ -96,4 +92,6 @@ public class Swordman extends AbstractAgentEntity {
     }
     public int getMaxVirtualAmmo(){return config.maxVirtualAmmo;}
     public int getAmmoPerCharge(){return config.chargePerAmmo;}
+    public static void updateClassConfig(@Nonnull AgentConfig config) {Swordman.config = config;}
+    public AgentConfig getAgentConfig() {return config;}
 }
