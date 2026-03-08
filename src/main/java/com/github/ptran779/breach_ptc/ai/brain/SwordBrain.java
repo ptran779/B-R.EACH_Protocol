@@ -4,7 +4,7 @@ import com.github.ptran779.breach_ptc.ai.behavior.*;
 import com.github.ptran779.breach_ptc.ai.api.GoalWrapper;
 import com.github.ptran779.breach_ptc.ai.api.MLServer;
 import com.github.ptran779.breach_ptc.ai.api.ScoreCompiler;
-import com.github.ptran779.email.DataManager;
+import com.github.ptran779.breach_ptc.ai.api.DataManager;
 import com.github.ptran779.breach_ptc.config.MlModelManager;
 import com.github.ptran779.breach_ptc.entity.agent.Swordman;
 import com.github.ptran779.breach_ptc.item.BrainChipItem;

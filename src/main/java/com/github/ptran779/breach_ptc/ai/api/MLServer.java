@@ -1,6 +1,5 @@
 package com.github.ptran779.breach_ptc.ai.api;
 
-import com.github.ptran779.email.DataManager;
 import com.github.ptran779.email.ML;
 
 import java.util.UUID;

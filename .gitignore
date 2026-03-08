@@ -31,3 +31,5 @@ note
 
 # custom package
 src/main/java/com/github/ptran779/email/*
+
+proguard-rules.pro

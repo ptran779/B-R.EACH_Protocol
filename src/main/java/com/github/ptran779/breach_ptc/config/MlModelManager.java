@@ -1,7 +1,7 @@
 package com.github.ptran779.breach_ptc.config;
 
 import com.github.ptran779.breach_ptc.BreachPtc;
-import com.github.ptran779.email.DataManager;
+import com.github.ptran779.breach_ptc.ai.api.DataManager;
 import com.github.ptran779.email.ML;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.LevelResource;

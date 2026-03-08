@@ -1,6 +1,6 @@
 package com.github.ptran779.breach_ptc.network.ml_packet;
 
-import com.github.ptran779.email.DataManager;
+import com.github.ptran779.breach_ptc.ai.api.DataManager;
 import com.github.ptran779.breach_ptc.config.MlModelManager;
 import com.github.ptran779.breach_ptc.network.PacketHandler;
 import net.minecraft.network.FriendlyByteBuf;
