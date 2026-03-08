@@ -28,3 +28,6 @@ forge*changelog.txt
 bb
 # note
 note
+
+# custom package
+src/main/java/com/github/ptran779/email/*

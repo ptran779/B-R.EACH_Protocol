@@ -1,0 +1,43 @@
+package com.github.ptran779.breach_ptc.network.advConfScr;
+
+import com.github.ptran779.breach_ptc.entity.agent.AbsAgentEntity;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraftforge.network.NetworkEvent;
+
+import java.util.function.Supplier;
+
+//C->S
+public class ChangeSkinPacket {
+  private final int entityId;
+  private final String payload;          //action payload -- expanse me if need more complex data communication
+
+  public ChangeSkinPacket(int entityId, String payload){
+    this.entityId = entityId;
+    this.payload = payload;
+  }
+
+  public void encode(FriendlyByteBuf buf) {
+    buf.writeInt(entityId);
+    buf.writeUtf(payload);
+  }
+
+  public static ChangeSkinPacket decode(FriendlyByteBuf buf){
+    int entityId = buf.readInt();
+    String payload = buf.readUtf();
+    return new ChangeSkinPacket(entityId, payload);
+  }
+
+  public void handle(Supplier<NetworkEvent.Context> ctx) {
+    ctx.get().enqueueWork(() -> {
+      ServerPlayer player = ctx.get().getSender();
+      if (player == null) return;
+
+      Entity e = player.level().getEntity(entityId);
+      if (!(e instanceof AbsAgentEntity agent)) return;
+      agent.setSkin(payload);
+    });
+    ctx.get().setPacketHandled(true);
+  }
+}

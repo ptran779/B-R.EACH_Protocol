@@ -1,6 +1,6 @@
 ## 🛠️ Issues & Requests
 
-If you need help or have an idea, please [open a GitHub issue](https://github.com/ptran779/AegisOps/issues). Please use one of these tags in your title:
+If you need help or have an idea, please [open a GitHub issue](https://github.com/ptran779/B-R.EACH_Protocol/issues). Please use one of these tags in your title:
 
 ### ❌ `[Bug Critical]`
 **Use this for crashes that close the game or make it unplayable.**

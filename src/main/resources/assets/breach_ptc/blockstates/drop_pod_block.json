@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "breach_ptc:block/drop_pod_block"
+    }
+  }
+}

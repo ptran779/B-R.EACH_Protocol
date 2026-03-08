@@ -1,9 +1,9 @@
 {
   "replace": false,
   "values": [
-    "aegisops:drop_pod_block",
-    "aegisops:drop_pod_block_used",
-    "aegisops:beacon_block",
-    "aegisops:beacon_block_unused"
+    "breach_ptc:drop_pod_block",
+    "breach_ptc:drop_pod_block_used",
+    "breach_ptc:beacon_block",
+    "breach_ptc:beacon_block_unused"
   ]
 }

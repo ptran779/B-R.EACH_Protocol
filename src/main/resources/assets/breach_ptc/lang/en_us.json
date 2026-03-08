@@ -1,0 +1,36 @@
+{
+  "itemGroup.breach_ptc.tab": "B-R.EACH Protocol",
+
+  "item.breach_ptc.soldier_spawn_egg": "Soldier Spawn Egg",
+  "item.breach_ptc.sniper_spawn_egg": "Sniper Spawn Egg",
+  "item.breach_ptc.heavy_spawn_egg": "Heavy Spawn Egg",
+  "item.breach_ptc.demolition_spawn_egg": "Demolition Spawn Egg",
+  "item.breach_ptc.medic_spawn_egg": "Medic Spawn Egg",
+  "item.breach_ptc.engineer_spawn_egg": "Engineer Spawn Egg",
+  "item.breach_ptc.swordman_spawn_egg": "Swordman Spawn Egg",
+  "item.breach_ptc.port_disp": "Portable Dispenser",
+  "item.breach_ptc.db_turret": "Double Barrel Turret",
+  "item.breach_ptc.engi_hammer": "Engineering Hammer",
+  "item.breach_ptc.bandage": "Bandage",
+  "item.breach_ptc.morphine": "Morphine Shot",
+  "item.breach_ptc.modular_shield": "Modular Shield",
+  "item.breach_ptc.grenade": "Grenade",
+  "item.breach_ptc.vp_terminal": "Vector Pursuer Terminal",
+  "item.breach_ptc.brain_chip": "Brain Chip",
+
+  "block.breach_ptc.drop_pod_block": "Drop Pod",
+  "block.breach_ptc.drop_pod_block_used": "Drop Pod",
+  "block.breach_ptc.beacon_block_unused": "Beacon",
+  "block.breach_ptc.beacon_block": "Beacon Core",
+  "block.breach_ptc.hell_pod_block": "Hell Pod",
+  "block.breach_ptc.hell_pod_block_bot": "Hell Pod",
+  "block.breach_ptc.hell_pod_block_top": "Hell Pod",
+
+  "entity.breach_ptc.port_disp": "Portable Dispenser",
+  "entity.breach_ptc.db_turret": "Double Barrel Turret",
+
+  "key.category.breach_ptc.breach_ptc": "B-R.EACH Controls",
+  "key.category.breach_ptc.follow_mode": "Toggle Follow Mode",
+  "key.category.breach_ptc.target_mode": "Toggle Target Mode",
+  "key.category.breach_ptc.special_mode": "Activate Special Ability"
+}
