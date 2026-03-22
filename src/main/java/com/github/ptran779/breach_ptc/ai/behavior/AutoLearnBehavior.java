@@ -20,7 +20,7 @@ public class AutoLearnBehavior extends ThrottleBehavior {
 	UUID unitUUID;
 	MlModelManager.MLUnit mUnit;
 	public AutoLearnBehavior(AbsAgentEntity agent, int baseCooldown, int varCooldown) {
-		super(baseCooldown, varCooldown, agent);
+		super(agent, baseCooldown, varCooldown);
 		this.agent = agent;
 	}
 
@@ -36,8 +36,7 @@ public class AutoLearnBehavior extends ThrottleBehavior {
 	}
 
 	public boolean prepareTraining(){
-		if (!(agent instanceof Swordman swordman)) return false;
-		if (!swordman.swordBrain.autotrain || swordman.swordBrain.scoreFunc == null) return false;
+		if (!agent.getSuperBrain().autotrain || agent.getSuperBrain().scoreFunc == null) return false;
 		ItemStack brainChip = agent.getChipBrainStack();
 		// confirm brain chip exist
 		if (brainChip.getItem() instanceof BrainChipItem brainChipItem){
@@ -45,7 +44,7 @@ public class AutoLearnBehavior extends ThrottleBehavior {
 			unitUUID = brainChipItem.getOrCreateUUID(brainChip);
 			mUnit = MlModelManager.getMUnit(unitUUID, agent.level().getGameTime());
 			// verified correct ML model && data state
-			if (mUnit.model == null || mUnit.model.getInsize() != agent.getSensorSize() || mUnit.model.getOutsize() != agent.getBehaviorSize()) return false;
+			if (mUnit.model == null || mUnit.model.getInsize() != agent.getInputSpace() || mUnit.model.getOutsize() != agent.getOutputSpace()) return false;
 			return mUnit.dataManager != null && !mUnit.dataManager.getRawDat().isEmpty(); // there is nothing to train off
 		}
 		return false;

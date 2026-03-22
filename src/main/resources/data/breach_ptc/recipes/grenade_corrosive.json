@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": ["iai", "bgb", "iai"],
+  "key": {
+    "i": { "item": "minecraft:iron_nugget" },
+    "a": { "item": "minecraft:fermented_spider_eye" },
+    "b": { "item": "minecraft:slime_ball" },
+    "g": { "item": "minecraft:gunpowder" }
+  },
+  "result": { "item": "breach_ptc:grenade_corrosive", "count": 1 },
+  "show_notification": true
+}

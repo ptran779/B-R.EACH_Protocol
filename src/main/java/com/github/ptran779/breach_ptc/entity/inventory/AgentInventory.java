@@ -99,14 +99,7 @@ public class AgentInventory extends SimpleContainer {
   public boolean gunExist(){
 	  return !getItem(agent.GUN_SLOT).isEmpty();
   }
-	/// quick scan for if gun has ammo in first place
-	public boolean gunExistWithAmmo(){
-		ItemStack stack = getItem(agent.GUN_SLOT);
-		if (stack.getItem() instanceof ModernKineticGunItem gunItem) {
-			return checkAmmoInChamber(stack, gunItem) > 0 || agent.getVirtualAmmo() > 0 || findGunAmmo(stack) != -1;
-		}
-		return false;
-	}
+
 	/// ammoInChamber
 	public int checkAmmoInChamber(ItemStack gunStack, AbstractGunItem gunItem){return gunItem.getCurrentAmmoCount(gunStack);}
 	public int checkAmmoInChamber(){
@@ -159,10 +152,7 @@ public class AgentInventory extends SimpleContainer {
       if (ammoCount != 0){return i;}
     }
     return -1;
-  };
-
-  // quick check to see if there's weapon in our slot
-  public boolean haveWeapon(){return meleeExist() || gunExistWithAmmo();}
+  }
 
   /// UTIL
   protected void swapItem(int id1, int id2){

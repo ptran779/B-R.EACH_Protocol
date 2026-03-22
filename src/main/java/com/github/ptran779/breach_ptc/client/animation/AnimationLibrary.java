@@ -5,7 +5,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import static com.github.ptran779.breach_ptc.client.animation.AgentLivingAnimation.*;
-import static com.github.ptran779.breach_ptc.client.animation.AgentSpecialAnimation.BONK;
+import static com.github.ptran779.breach_ptc.client.animation.AgentSpecialAnimation.*;
 import static com.github.ptran779.breach_ptc.client.animation.AnimationID.*;
 
 @OnlyIn(Dist.CLIENT)
@@ -27,6 +27,15 @@ public class AnimationLibrary {
 	  AGENT_ANI[A_GUN_DRAW]= GUN_DRAW;
 	  AGENT_ANI[A_STATION_RELOAD] = STATION_RELOAD;
     AGENT_ANI[A_BONK]= BONK;
+
+	  AGENT_ANI[A_BAND_AID]= MEDIC_BANDAGE;
+	  AGENT_ANI[A_SYRINGE]= MEDIC_SYRINGE;
+	  AGENT_ANI[A_VP_DEPLOY]= TERMINAL_ACTIVATE;
+	  AGENT_ANI[A_THROW_GRENADE]= GRENADE_THROW;
+		AGENT_ANI[A_PRECISION_SNIPE]= PRECISION_SHOT;
+	  AGENT_ANI[A_SHIELD_DEPLOY]= SHIELD_DEPLOY;
+	  AGENT_ANI[A_SHIELD_CHARGE]= SHIELD_CHARGE;
+	  AGENT_ANI[A_SHIELD_BONK]= SHIELD_BONK;
   }
 
   public static AnimationDefinition get(int id) {

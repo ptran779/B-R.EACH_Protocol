@@ -17,7 +17,7 @@ apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.20.1-2.0.0Alpha'
+version = '1.20.1-2.0.0Beta'
 group = 'com.github.ptran779.B-R.EACH_Protocol'
 archivesBaseName = 'B-R.EACH_Protocol'
 

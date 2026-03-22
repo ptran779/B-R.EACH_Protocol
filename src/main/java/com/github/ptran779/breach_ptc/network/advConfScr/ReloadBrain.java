@@ -1,5 +1,6 @@
 package com.github.ptran779.breach_ptc.network.advConfScr;
 
+import com.github.ptran779.breach_ptc.entity.agent.AbsAgentEntity;
 import com.github.ptran779.breach_ptc.entity.agent.Swordman;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -24,8 +25,8 @@ public class ReloadBrain {
 			if (player == null) return;
 
 			Entity e = player.level().getEntity(agentId);
-			if (!(e instanceof Swordman swordAgent)) return;  // fixme for quick test only
-			swordAgent.reloadBrain();
+			if (!(e instanceof AbsAgentEntity agent)) return;
+			agent.reloadBrain();
 
 			ctx.get().setPacketHandled(true);
 		});

@@ -1,6 +1,9 @@
 package com.github.ptran779.breach_ptc.server;
 
 import com.github.ptran779.breach_ptc.entity.agent.AbsAgentEntity;
+import com.github.ptran779.breach_ptc.entity.extra.KSeedCore;
+import com.github.ptran779.breach_ptc.entity.extra.VoidDrifterModule;
+import com.github.ptran779.breach_ptc.player.TaticalCommandProvider;
 import com.github.ptran779.email.ML;
 import com.github.ptran779.breach_ptc.config.MlModelManager;
 import com.github.ptran779.breach_ptc.config.ServerConfig;
@@ -21,17 +24,24 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.UuidArgument;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
+import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
@@ -46,13 +56,14 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import static com.github.ptran779.breach_ptc.Utils.summonerTest;
 import static com.github.ptran779.breach_ptc.network.PacketHandler.CHANNELS;
-import static com.github.ptran779.breach_ptc.server.EntityInit.FALLING_HELL_POD;
+import static com.github.ptran779.breach_ptc.server.EntityInit.*;
 
 @Mod.EventBusSubscriber(modid = BreachPtc.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ForgeServerEvent {
 	public static MLServer BRAIN_SERVER = null;
-	public static Set<UUID> PLAYERS_SERVER_MONITOR = null;  // fixme init and dump for server start stop
+	public static Set<UUID> PLAYERS_SERVER_MONITOR = null;
 
 	@SubscribeEvent public static void onServerStarting(ServerStartingEvent event) {
 		AgentConfigManager.serverGenerateDefault();
@@ -69,6 +80,17 @@ public class ForgeServerEvent {
 		}
 		PLAYERS_SERVER_MONITOR = null;
 		MlModelManager.cleanAll();
+	}
+	@SubscribeEvent public static void onEntityJoinLevel(EntityJoinLevelEvent event) {
+		// let test this
+		if (event.getEntity() instanceof Monster mob) {
+			mob.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(mob, AbsAgentEntity.class, true,
+				e -> e instanceof AbsAgentEntity agent
+					&& !mob.isAlliedTo(agent)
+					&& mob.distanceToSqr(agent) < (mob.getAttributeValue(Attributes.FOLLOW_RANGE) * 0.5)
+					* (mob.getAttributeValue(Attributes.FOLLOW_RANGE) * 0.5) // half range squared
+			));
+		}
 	}
 
 	private static int[] getRankedIndices(float[] decisions) {
@@ -104,17 +126,19 @@ public class ForgeServerEvent {
 		}
 		return null; // Entity is offline or chunk unloaded
 	}
-	public static void printObservation(String msg, MinecraftServer server){
+	public static void printObservation(String msg, MinecraftServer server) {
 		if (PLAYERS_SERVER_MONITOR.isEmpty()) return;
 		Component msgCom = Component.literal(msg);
 		for (UUID id : PLAYERS_SERVER_MONITOR) {
 			ServerPlayer player = server.getPlayerList().getPlayer(id);
-			if (player == null) {PLAYERS_SERVER_MONITOR.remove(id);continue;}
+			if (player == null) {
+				PLAYERS_SERVER_MONITOR.remove(id);
+				continue;
+			}
 			player.sendSystemMessage(msgCom);
 		}
 	}
-	@SubscribeEvent
-	public static void processAgentBehavior(TickEvent.ServerTickEvent event) {
+	@SubscribeEvent public static void processAgentBehavior(TickEvent.ServerTickEvent event) {
 		if (event.phase == TickEvent.Phase.END) return;
 		ServerLevel level = event.getServer().getLevel(Level.OVERWORLD);  // this level should always run
 		if (level == null) return;
@@ -125,12 +149,13 @@ public class ForgeServerEvent {
 			// get max payload
 			// get agent entity from server?
 			Entity rawEntity = findEntityByUUID(event.getServer(), payload.agentUUID());
-			if (rawEntity instanceof Swordman swordentity) {
-				swordentity.swordBrain.doneComputing();     // mark brain finish
+			if (rawEntity instanceof AbsAgentEntity agent) {
+				agent.getSuperBrain().doneComputing();     // mark brain finish
 				int[] dec = getRankedIndices(payload.decision());
-				printObservation(swordentity.getAgentType() + " " + swordentity.getDisplayName().getString() +
-					" will try " + Arrays.toString(payload.decision()), level.getServer());
-				swordentity.swordBrain.tryBehaviorChain(dec);
+				printObservation(
+					agent.getAgentType() + " " + agent.getDisplayName().getString() + " will try " + Arrays.toString(
+						payload.decision()), level.getServer());
+				agent.getSuperBrain().tryBehaviorChain(dec);
 			}
 		}
 		//train
@@ -156,57 +181,28 @@ public class ForgeServerEvent {
 				target.model2 = null;
 
 				for (ServerLevel lev : event.getServer().getAllLevels()) {
-					Entity agent = lev.getEntity(payload.targetUUID());
-					if (agent instanceof Swordman swordentity) {
-						printObservation(swordentity.getAgentType() + " " + swordentity.getDisplayName().getString() +
-							" finish self learning with score improvement of " + (stat.endScore() - stat.startScore()), level.getServer());
-						swordentity.swordBrain.doneComputing();  // turn off blocker, allow brain resume
+					Entity entity = lev.getEntity(payload.targetUUID());
+					if (entity instanceof AbsAgentEntity agent) {
+						printObservation(agent.getAgentType() + " " + agent.getDisplayName()
+								.getString() + " finish self learning with score improvement of " + (stat.endScore() - stat.startScore()),
+							level.getServer());
+						agent.getSuperBrain().doneComputing();  // turn off blocker, allow brain resume
 						if (upgrade) {
-							swordentity.swordBrain.failTime = 0;
+							agent.getSuperBrain().failTime = 0;
 						} else {
-							if (++swordentity.swordBrain.failTime >= swordentity.swordBrain.impTime) {
-								swordentity.swordBrain.autotrain = false;
-								swordentity.swordBrain.failTime = 0;
+							if (++agent.getSuperBrain().failTime >= agent.getSuperBrain().impTime) {
+								agent.getSuperBrain().autotrain = false;
+								agent.getSuperBrain().failTime = 0;
 							}
 							;
 						}
 						return;
 					}
-				};
+				}
+				;
 			}
 		}
 	}
-
-//	@SubscribeEvent public static void deployHellPod(
-//		TickEvent.ServerTickEvent event) {  // maybe swap to day/night time trigger fixme
-//		if (event.phase != TickEvent.Phase.END) return;
-//		// This is guaranteed to be server-side already
-//		ServerLevel level = event.getServer().getLevel(Level.OVERWORLD);
-//		if (level == null) return;
-//		if (level.getGameTime() % ServerConfig.SPAWN_EVENT_PERIOD.get() != 0) return;
-//		// Spawn event
-//		for (ServerPlayer player : event.getServer().getPlayerList().getPlayers()) {
-//			if (level.random.nextDouble() >= ServerConfig.CHANCE_TO_SPAWN.get()) continue;
-//
-//			// pick spawning location
-//			double angle = level.random.nextDouble() * 2 * Math.PI;
-//			double distance =
-//				Mth.nextDouble(level.random, ServerConfig.MIN_SPAWN_DISTANCE.get(), ServerConfig.MAX_SPAWN_DISTANCE.get());
-//			double centerX = player.getX() + Math.cos(angle) * distance;
-//			double centerZ = player.getZ() + Math.sin(angle) * distance;
-//			double centerY = level.getMaxBuildHeight() - 1;
-//			// Roll how many pods to spawn
-//			int min = ServerConfig.CLUSTER_SIZE_MIN.get();
-//			int max = ServerConfig.CLUSTER_SIZE_MAX.get();
-//			int clusterSize = Mth.nextInt(level.random, min, max);
-//			for (int i = 0; i < clusterSize; i++) {
-//				// extra offset for spread
-//				double offsetX = centerX + (level.random.nextDouble() - 0.5) * 20;
-//				double offsetZ = centerZ + (level.random.nextDouble() - 0.5) * 20;
-//				Utils.summonReinforcement(offsetX, centerY, offsetZ, level);
-//			}
-//		}
-//	}
 
 	/// Player deployment on world join first time
 	@SubscribeEvent public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
@@ -233,17 +229,16 @@ public class ForgeServerEvent {
 		}
 
 		// fixme change this/update as needed
+		player.sendSystemMessage(Component.literal("[B-R.EACH PROTOCOL (FORMALLY AEGIS OPS) BETA V.2] COMPLETE AI REWORK")
+			.withStyle(ChatFormatting.RED).withStyle(ChatFormatting.BOLD));
 		player.sendSystemMessage(
-			Component.literal("[B-R.EACH PROTOCOL (FORMALLY AEGIS OPS) EARLY ALPHA V.2] COMPLETE AI REWORK").withStyle(ChatFormatting.RED)
-				.withStyle(ChatFormatting.BOLD));
-		player.sendSystemMessage(
-			Component.literal("Only SWORDMAN is functional. Other units are disabled until majority of the test is ready.")
-				.withStyle(ChatFormatting.GRAY));
+			Component.literal("Based AI is ready. All special ability has been transfer over").withStyle(ChatFormatting.GRAY));
 		player.sendSystemMessage(Component.literal(
-				"NOT MEANT FOR LONG GAME PLAY, PLEASE WAIT FOR BETA IF YOU VALUE YOUR " + "WORLD, AS MANY THING CAN CHANGE DURING.")
+				"Not recommend for long term ai yet. Based goal system is stable, but just in case I might need to upgrade the AI IO.")
 			.withStyle(ChatFormatting.DARK_RED).withStyle(ChatFormatting.BOLD));
-		player.sendSystemMessage(Component.literal("You can get help in discord (link on B-REACH Protocol's modridth page).")
-			.withStyle(ChatFormatting.BLUE).withStyle(ChatFormatting.ITALIC));
+		player.sendSystemMessage(
+			Component.literal("You can get help in discord (link on B-REACH Protocol's modridth page).")
+				.withStyle(ChatFormatting.BLUE).withStyle(ChatFormatting.ITALIC));
 
 		if (!data.getBoolean("hasJoinedBefore")) {
 			data.putBoolean("hasJoinedBefore", true);
@@ -251,112 +246,117 @@ public class ForgeServerEvent {
 			// 🚀 This is the first join!
 			player.sendSystemMessage(Component.literal("Welcome Survivor."));
 			// spawn pod, play sound, set tags, etc.
-			FallingHellPod pod = new FallingHellPod(FALLING_HELL_POD.get(), player.level());
-			pod.setPos(player.getX(), player.level().getMaxBuildHeight() - 1, player.getZ());
-			player.level().addFreshEntity(pod);
-			player.startRiding(pod, true);
+
+			VoidDrifterModule voidDrifter = new VoidDrifterModule(VOID_DRIFTER_MODULE_ENT.get(), player.level());
+			voidDrifter.setPos(player.getX(), player.level().getMaxBuildHeight() - 1, player.getZ());
+			KSeedCore kSeedCore = new KSeedCore(K_SEED_CORE_ENT.get(), player.level());
+			kSeedCore.setPos(player.getX(), player.level().getMaxBuildHeight() - 1, player.getZ());
+			kSeedCore.startRiding(voidDrifter);
+			player.startRiding(kSeedCore, true);
+			float speed = 2;
+			// Random horizontal direction
+			float yaw = player.level().random.nextFloat() * 360F;
+			float yawRad = yaw * (float) (Math.PI / 180F);
+			voidDrifter.setDeltaMovement(Mth.sin(-yawRad) * speed, 0D, Mth.cos(yawRad) * speed);
+			player.level().addFreshEntity(voidDrifter);
+			player.level().addFreshEntity(kSeedCore);
+
 			CHANNELS.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) player), new CameraModePacket());
 		}
 	}
 
 	/// Telemetry command
-	@SubscribeEvent
-	public static void onRegisterCommands(RegisterCommandsEvent event) {
-		LiteralArgumentBuilder<CommandSourceStack> aegisCommand = Commands.literal("breach_ptc")
-			.requires(s -> s.hasPermission(0));
+	@SubscribeEvent public static void onRegisterCommands(RegisterCommandsEvent event) {
+		LiteralArgumentBuilder<CommandSourceStack> breachPtcCommand =
+			Commands.literal("breach_ptc").requires(s -> s.hasPermission(0));
 
 		// server monitoring of the ML compute
-		aegisCommand.then(Commands.literal("monitorserver")
-			.executes(context -> {
-				// Logic for server monitoring toggle
-				ServerPlayer player = context.getSource().getPlayerOrException();
-				UUID uuid = player.getUUID();
-				if (PLAYERS_SERVER_MONITOR.contains(uuid)) {
-					PLAYERS_SERVER_MONITOR.remove(uuid);
-					player.sendSystemMessage(Component.literal("Server monitoring disabled."));
-				} else {
-					PLAYERS_SERVER_MONITOR.add(uuid);
-					player.sendSystemMessage(Component.literal("Server monitoring enabled."));
-				}
-				return 1;
-			})
-		);
+		breachPtcCommand.then(Commands.literal("monitorserver").executes(context -> {
+			// Logic for server monitoring toggle
+			ServerPlayer player = context.getSource().getPlayerOrException();
+			UUID uuid = player.getUUID();
+			if (PLAYERS_SERVER_MONITOR.contains(uuid)) {
+				PLAYERS_SERVER_MONITOR.remove(uuid);
+				player.sendSystemMessage(Component.literal("Server monitoring disabled."));
+			} else {
+				PLAYERS_SERVER_MONITOR.add(uuid);
+				player.sendSystemMessage(Component.literal("Server monitoring enabled."));
+			}
+			return 1;
+		}));
 
 		// individual entity monitoring (1 Branch with Tab-Complete)
-		aegisCommand.then(Commands.literal("monitorentity")
-			.then(Commands.argument("id", UuidArgument.uuid())
-				.suggests((context, builder) -> {
-					ServerPlayer player = context.getSource().getPlayerOrException();
+		breachPtcCommand.then(Commands.literal("monitorentity")
+			.then(Commands.argument("id", UuidArgument.uuid()).suggests((context, builder) -> {
+				ServerPlayer player = context.getSource().getPlayerOrException();
 
-					// 1. Raytrace 8 blocks to see if they are looking directly at an agent
-					EntityHitResult hit = ProjectileUtil.getEntityHitResult(
-						player,
-						player.getEyePosition(),
-						player.getEyePosition().add(player.getLookAngle().scale(8)),
-						player.getBoundingBox().expandTowards(player.getLookAngle().scale(8)).inflate(1.0D),
-						(e) -> e instanceof AbsAgentEntity,
-						8 * 8
-					);
+				// 1. Raytrace 8 blocks to see if they are looking directly at an agent
+				EntityHitResult hit = ProjectileUtil.getEntityHitResult(player, player.getEyePosition(),
+					player.getEyePosition().add(player.getLookAngle().scale(8)),
+					player.getBoundingBox().expandTowards(player.getLookAngle().scale(8)).inflate(1.0D),
+					(e) -> e instanceof AbsAgentEntity, 8 * 8);
 
-					if (hit != null && hit.getEntity() instanceof AbsAgentEntity target) {
-						// If looking right at one, suggest ONLY that agent's UUID
-						builder.suggest(target.getUUID().toString());
+				if (hit != null && hit.getEntity() instanceof AbsAgentEntity target) {
+					// If looking right at one, suggest ONLY that agent's UUID
+					builder.suggest(target.getUUID().toString());
+				} else {
+					// 2. Fallback: Suggest all agents within a 10-block radius
+					player.level().getEntitiesOfClass(AbsAgentEntity.class, player.getBoundingBox().inflate(10.0D))
+						.forEach(agent -> builder.suggest(agent.getUUID().toString()));
+				}
+
+				return builder.buildFuture();
+			}).executes(context -> {
+				// The execution path is now perfectly clean. Just grab the ID and toggle.
+				ServerPlayer player = context.getSource().getPlayerOrException();
+				UUID targetId = UuidArgument.getUuid(context, "id");
+
+				Entity entity = ((ServerLevel) player.level()).getEntity(targetId);
+
+				if (entity instanceof AbsAgentEntity agent) {
+					// Optional toggle logic: if already monitoring, remove them. Otherwise, add them.
+					// (Assuming you have a way to check observers, otherwise just do addObserver)
+					if (agent.toggleObserver(player.getUUID())) {
+						context.getSource()
+							.sendSuccess(() -> Component.literal("Monitoring: " + agent.getDisplayName().getString()), false);
 					} else {
-						// 2. Fallback: Suggest all agents within a 10-block radius
-						player.level().getEntitiesOfClass(AbsAgentEntity.class, player.getBoundingBox().inflate(10.0D))
-							.forEach(agent -> builder.suggest(agent.getUUID().toString()));
+						context.getSource()
+							.sendSuccess(() -> Component.literal("Stop Monitoring: " + agent.getDisplayName().getString()), false);
 					}
+				} else {
+					context.getSource().sendFailure(Component.literal("Agent with that UUID not found."));
+				}
+				return 1;
+			})));
 
-					return builder.buildFuture();
-				})
-				.executes(context -> {
-					// The execution path is now perfectly clean. Just grab the ID and toggle.
-					ServerPlayer player = context.getSource().getPlayerOrException();
-					UUID targetId = UuidArgument.getUuid(context, "id");
-
-					Entity entity = ((ServerLevel) player.level()).getEntity(targetId);
-
-					if (entity instanceof AbsAgentEntity agent) {
-						// Optional toggle logic: if already monitoring, remove them. Otherwise, add them.
-						// (Assuming you have a way to check observers, otherwise just do addObserver)
-						if (agent.toggleObserver(player.getUUID())){
-							context.getSource().sendSuccess(() -> Component.literal("Monitoring: " + agent.getDisplayName().getString()), false);
-						} else {
-							context.getSource().sendSuccess(() -> Component.literal("Stop Monitoring: " + agent.getDisplayName().getString()), false);
-						}
-					} else {
-						context.getSource().sendFailure(Component.literal("Agent with that UUID not found."));
-					}
-					return 1;
-				})
-			)
-		);
+		breachPtcCommand.then(Commands.literal("summoner_test").requires(s -> s.hasPermission(2)) // op level
+			.executes(context -> {
+				summonerTest(context);
+				return 1;
+			}));
 
 		// 4. Finally, register the fully built tree
-		event.getDispatcher().register(aegisCommand);
+		event.getDispatcher().register(breachPtcCommand);
 	}
 
 	// Capabilities stuff
-//  @SubscribeEvent
-//  public static void onAttachCapabilitiesPlayer(AttachCapabilitiesEvent<Entity> event) {
-//    if(event.getObject() instanceof Player) {
-//      if(!event.getObject().getCapability(TaticalCommandProvider.TATICAL_COMMAND_CAPABILITY).isPresent()) {
-//        event.addCapability(new ResourceLocation(AegisOps.MOD_ID, "properties"), new TaticalCommandProvider());
-//      }
-//    }
-//  }
-//  @SubscribeEvent
-//  public static void onPlayerCloned(PlayerEvent.Clone event) {
-//    if(event.isWasDeath()){
-//      event.getOriginal().getCapability(TaticalCommandProvider.TATICAL_COMMAND_CAPABILITY).ifPresent(oldStore -> {
-//        event.getOriginal().getCapability(TaticalCommandProvider.TATICAL_COMMAND_CAPABILITY).ifPresent(newStore -> {
-//          newStore.copyFrom(oldStore);
-//        });
-//      });
-//    }
-//  }
-//  @SubscribeEvent
-//  public static void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
-//    event.register(TaticalCommandProvider.class);
-//  }
+	@SubscribeEvent public static void onAttachCapabilitiesPlayer(AttachCapabilitiesEvent<Entity> event) {
+		if (event.getObject() instanceof Player) {
+			if (!event.getObject().getCapability(TaticalCommandProvider.TATICAL_COMMAND_CAPABILITY).isPresent()) {
+				event.addCapability(new ResourceLocation(BreachPtc.MOD_ID, "properties"), new TaticalCommandProvider());
+			}
+		}
+	}
+	@SubscribeEvent public static void onPlayerCloned(PlayerEvent.Clone event) {
+		if (event.isWasDeath()) {
+			event.getOriginal().getCapability(TaticalCommandProvider.TATICAL_COMMAND_CAPABILITY).ifPresent(oldStore -> {
+				event.getOriginal().getCapability(TaticalCommandProvider.TATICAL_COMMAND_CAPABILITY).ifPresent(newStore -> {
+					newStore.copyFrom(oldStore);
+				});
+			});
+		}
+	}
+	@SubscribeEvent public static void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
+		event.register(TaticalCommandProvider.class);
+	}
 }

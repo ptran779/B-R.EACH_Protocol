@@ -134,9 +134,6 @@ public class FallingHellPod extends LivingEntity implements IEntityRender {
     }
     this.discard(); // Remove falling entity
   }
-  public boolean canAddPassenger(Entity passenger) {
-    return this.getPassengers().isEmpty(); // Only one passenger
-  }
   protected void positionRider(Entity passenger, MoveFunction moveFunc) {
     if (passenger != null && this.hasPassenger(passenger)) {
       moveFunc.accept(passenger, getX(), getY() + 0.5D, getZ());

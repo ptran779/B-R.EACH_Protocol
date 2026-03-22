@@ -13,6 +13,9 @@ public abstract class Brain {
   protected int activeBehaviours=-1;
   protected int lastRunBehaviours=-1;
 
+	public int getActiveBehaviours(){return activeBehaviours;};
+	public int getlastRunBehaviours(){return lastRunBehaviours;};
+
 	public Brain(LivingEntity brainEntity) {
 		behaviors = new ArrayList<>();
 		this.brainEntity = brainEntity;
@@ -52,7 +55,7 @@ public abstract class Brain {
 	public void onBehaviorStart(int startB){flushUpdate();}
 
   public abstract void preTick();  // decision picking -- highly asyc
-	public void postTick() {
+	public void postTick() {  // fixme dumbass llm fuck up behavior stop somehwere
 		// 1. Handle stopping the OLD behavior if the Brain switched tasks
 		if (lastRunBehaviours != activeBehaviours && lastRunBehaviours != -1) {
 			onBehaviorStop(lastRunBehaviours);

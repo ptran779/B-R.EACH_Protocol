@@ -1,5 +1,6 @@
 package com.github.ptran779.breach_ptc.network.advConfScr;
 
+import com.github.ptran779.breach_ptc.entity.agent.AbsAgentEntity;
 import com.github.ptran779.breach_ptc.entity.agent.Swordman;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -40,11 +41,11 @@ public class SetATrainConf {
 			Entity entity = player.level().getEntity(entityId);
 
 			// Swap "AbstractAgentEntity" with whatever your actual base swordman class is
-			if (entity instanceof Swordman swordman) {
-				swordman.swordBrain.autotrain = autoTrain;
-				swordman.swordBrain.trySetCollectExp(collectExp);
-				swordman.swordBrain.impTime = impTime;
-				swordman.swordBrain.exploreRate = exploreRate;
+			if (entity instanceof AbsAgentEntity agent) {
+				agent.getSuperBrain().autotrain = autoTrain;
+				agent.getSuperBrain().trySetCollectExp(collectExp);
+				agent.getSuperBrain().impTime = impTime;
+				agent.getSuperBrain().exploreRate = exploreRate;
 			}
 		});
 		ctx.get().setPacketHandled(true);

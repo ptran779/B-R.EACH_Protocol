@@ -27,7 +27,7 @@ public class TakeCoverBehavior extends ThrottleBehavior {
 
 	public TakeCoverBehavior(AbsAgentEntity agent, int baseCooldown, int varCooldown,
 	                         Sensor<LivingEntity> retarHostileS, int minRange, double coverSearchRange) {
-		super(baseCooldown, varCooldown, agent);
+		super(agent, baseCooldown, varCooldown);
 		this.agent = agent;
 		this.retarHostileS = retarHostileS;
 		this.minRangeSq = minRange * minRange;
@@ -35,7 +35,7 @@ public class TakeCoverBehavior extends ThrottleBehavior {
 	}
 
 	public boolean canUse() {
-		if (!super.canUse()) return false;
+		if (!super.canUse() || agent.isPassenger()) return false;
 		target = retarHostileS.get(agent.tickCount);
 
 		if (target == null || !isRangeEnemy()) return false;

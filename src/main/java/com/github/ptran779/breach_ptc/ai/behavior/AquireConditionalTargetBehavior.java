@@ -12,7 +12,7 @@ public class AquireConditionalTargetBehavior extends ThrottleBehavior {
 	protected float dropRangeSq;
 	public AquireConditionalTargetBehavior(AbsAgentEntity agent, int baseCooldown, int varCooldown, float dropRange,
 	                                       Sensor<LivingEntity> nearestTargetable) {
-		super(baseCooldown, varCooldown, agent);
+		super(agent, baseCooldown, varCooldown);
 		this.agent = agent;
 		dropRangeSq = dropRange*dropRange;
 		this.targetSensor = nearestTargetable;

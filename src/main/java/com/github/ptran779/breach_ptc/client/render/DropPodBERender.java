@@ -1,7 +1,7 @@
 package com.github.ptran779.breach_ptc.client.render;
 
 import com.github.ptran779.breach_ptc.BreachPtc;
-import com.github.ptran779.breach_ptc.block.DropPodBE;
+import com.github.ptran779.breach_ptc.block_entity.DropPodBE;
 import com.github.ptran779.breach_ptc.client.model.DropPodModel;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;

@@ -1,6 +1,7 @@
 package com.github.ptran779.breach_ptc.item;
 
 import com.github.ptran779.breach_ptc.client.ModClientEvents;
+import com.github.ptran779.breach_ptc.entity.api.IEntityTeamNTarget;
 import com.github.ptran779.breach_ptc.entity.extra.Grenade;
 import com.github.ptran779.breach_ptc.server.EntityInit;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
@@ -17,6 +18,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -26,61 +28,143 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static com.github.ptran779.breach_ptc.config.ServerConfig.*;
 
 public class GrenadeItem extends Item {
-  public static final double MaxThrowSpeed = 1.15;
-  public GrenadeItem(Properties pProperties) {
-    super(pProperties);
-  }
-  @OnlyIn(Dist.CLIENT)
-  public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-    consumer.accept(new IClientItemExtensions() {
-      public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-        return ModClientEvents.GRENADE_RENDER_INSTANCE; // Your renderer here
-      }
-    });
-  }
+	public static final double MaxThrowSpeed = 1.15;
+	private final Grenade.GrenadeType grenadeType;
 
-  public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-    ItemStack stack = player.getItemInHand(hand);
-    CompoundTag tag = stack.getOrCreateTag();
+	public GrenadeItem(Properties pProperties, Grenade.GrenadeType type) {
+		super(pProperties);
+		this.grenadeType = type;
+	}
+	@OnlyIn(Dist.CLIENT) public void initializeClient(Consumer<IClientItemExtensions> consumer) {
+		consumer.accept(new IClientItemExtensions() {
+			public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+				return ModClientEvents.GRENADE_RENDER_INSTANCE; // Your renderer here
+			}
+		});
+	}
 
-    if (!tag.contains("DeployTick")) {
-      if (!level.isClientSide()) {tag.putLong("DeployTick", level.getGameTime());}
-    } else {player.startUsingItem(hand);}
-    return InteractionResultHolder.consume(stack);
-  }
+	public Grenade.GrenadeType getGrenadeType() {return grenadeType;}
 
-  public void releaseUsing(ItemStack stack, Level level, LivingEntity user, int timeLeft) {
-    if (!level.isClientSide() && stack.getOrCreateTag().contains("DeployTick")) {
-      // Create grenade entity
-      Grenade grenade = new Grenade(EntityInit.GRENADE.get(), level);
-      grenade.setFuseTick(100);
-      grenade.setPos(user.getX(), user.getEyeY() - 0.1, user.getZ());
+	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+		ItemStack stack = player.getItemInHand(hand);
+		CompoundTag tag = stack.getOrCreateTag();
 
-      // Set velocity toward look direction
-      Vec3 look = user.getLookAngle(); // already normalized
-      grenade.setDeltaMovement(look.scale(MaxThrowSpeed));
+		if (!tag.contains("DeployTick")) {
+			if (!level.isClientSide()) {
+				tag.putLong("DeployTick", level.getGameTime());
+			}
+		} else {
+			player.startUsingItem(hand);
+		}
+		return InteractionResultHolder.consume(stack);
+	}
 
-      // Optional: set rotation to match
-      grenade.setYRot(user.getYRot());
-      grenade.setXRot(user.getXRot());
+	public void releaseUsing(ItemStack stack, Level level, LivingEntity user, int timeLeft) {
+		if (!level.isClientSide() && stack.getOrCreateTag().contains("DeployTick")) {
+			// Create grenade entity
+			Grenade grenade = new Grenade(EntityInit.GRENADE.get(), level);
+			grenade.setGrenadeType(grenadeType);
 
-      // Spawn and play sound
-      level.addFreshEntity(grenade);
-      level.playSound(null, user.blockPosition(), SoundEvents.SNOWBALL_THROW, SoundSource.PLAYERS, 0.5F, 1.0F);
+			grenade.setPos(user.getX(), user.getEyeY() - 0.1, user.getZ());
 
-      // Clear tag so it doesn't repeat
-      stack.removeTagKey("DeployTick");
-    }
-  }
+			// Set velocity toward look direction
+			Vec3 look = user.getLookAngle(); // already normalized
+			grenade.setDeltaMovement(look.scale(MaxThrowSpeed));
 
-  public UseAnim getUseAnimation(ItemStack stack) {return UseAnim.SPEAR;}
-  public int getUseDuration(ItemStack stack) {return 72000;}
+			// Optional: set rotation to match
+			grenade.setYRot(user.getYRot());
+			grenade.setXRot(user.getXRot());
 
-  public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
-    pTooltipComponents.add(Component.literal("Demolition Special Item"));
-    super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
-  }
+			// Spawn and play sound
+			level.addFreshEntity(grenade);
+			level.playSound(null, user.blockPosition(), SoundEvents.SNOWBALL_THROW, SoundSource.PLAYERS, 0.5F, 1.0F);
+
+			// Clear tag so it doesn't repeat
+			stack.removeTagKey("DeployTick");
+
+			// shrink if not creative
+			if (!(user instanceof Player player) || !player.getAbilities().instabuild) {
+				stack.shrink(1);
+			}
+		}
+	}
+
+	public UseAnim getUseAnimation(ItemStack stack) {return UseAnim.SPEAR;}
+	public int getUseDuration(ItemStack stack) {return 72000;}
+
+	public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents,
+	                            TooltipFlag pIsAdvanced) {
+		pTooltipComponents.add(Component.literal("Demolition & Soldier Special Item"));
+		super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
+	}
+
+	// safety check so not wasteful if using goal system, AND avoid hurting friendly in range
+	public boolean shouldUseCheck(IEntityTeamNTarget user, LivingEntity target){
+		return switch (grenadeType){
+			case FRAG -> {
+				AABB area = target.getBoundingBox().inflate(4.0);
+				List<LivingEntity> entities = target.level().getEntitiesOfClass(LivingEntity.class, area);
+				// ally check
+				boolean allyInDanger = entities.stream().anyMatch(user::isAlly);
+				if (allyInDanger) yield false;
+
+				long enemyCount = entities.stream().filter(e -> e.isAlive() && user.shouldTargetEntity(user, e)).count();
+				yield enemyCount >= GRENADE_FRAG_CLUSTER.get();
+			}
+			case INCENDIARY -> {
+				AABB area = target.getBoundingBox().inflate(4.0);
+				List<LivingEntity> entities = target.level().getEntitiesOfClass(LivingEntity.class, area);
+				// ally check
+				boolean allyInDanger = entities.stream().anyMatch(user::isAlly);
+				if (allyInDanger) yield false;
+
+				long enemyCount = entities.stream().filter(e -> e.isAlive() && user.shouldTargetEntity(user, e)).count();
+				yield enemyCount >= GRENADE_INCENDIARY_CLUSTER.get();
+			}
+			case EMP -> {
+				AABB area = target.getBoundingBox().inflate(6.0);
+				List<LivingEntity> entities = target.level().getEntitiesOfClass(LivingEntity.class, area);
+				// ally check
+				boolean allyInDanger = entities.stream().anyMatch(user::isAlly);
+				if (allyInDanger) yield false;
+
+				long enemyCount = entities.stream().filter(e -> e.isAlive() && user.shouldTargetEntity(user, e)).count();
+				yield enemyCount >= GRENADE_EMP_CLUSTER.get();
+			}
+			case CORROSIVE -> {
+				AABB area = target.getBoundingBox().inflate(4.0);
+				List<LivingEntity> entities = target.level().getEntitiesOfClass(LivingEntity.class, area);
+				// ally check
+				boolean allyInDanger = entities.stream().anyMatch(user::isAlly);
+				if (allyInDanger) yield false;
+				if (target.getArmorValue() <= 0) yield false;  // no armor so why bother?
+				long enemyCount = entities.stream().filter(e -> e.isAlive() && user.shouldTargetEntity(user, e)).count();
+				yield enemyCount >= GRENADE_CORROSIVE_CLUSTER.get();
+			}
+			case CRYO -> {
+				AABB area = target.getBoundingBox().inflate(6.0);
+				List<LivingEntity> entities = target.level().getEntitiesOfClass(LivingEntity.class, area);
+				// ally check
+				boolean allyInDanger = entities.stream().anyMatch(user::isAlly);
+				if (allyInDanger) yield false;
+
+				long enemyCount = entities.stream().filter(e -> e.isAlive() && user.shouldTargetEntity(user, e)).count();
+				yield enemyCount >= GRENADE_CRYO_CLUSTER.get();
+			}
+			case FLASHBANG -> {
+				AABB area = target.getBoundingBox().inflate(8.0);
+				List<LivingEntity> entities = target.level().getEntitiesOfClass(LivingEntity.class, area);
+				// ally check
+				boolean allyInDanger = entities.stream().anyMatch(user::isAlly);
+				if (allyInDanger) yield false;
+
+				long enemyCount = entities.stream().filter(e -> e.isAlive() && user.shouldTargetEntity(user, e)).count();
+				yield enemyCount >= GRENADE_FLASHBANG_CLUSTER.get();
+			}
+		};
+	} 
 }
 

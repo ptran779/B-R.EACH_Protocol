@@ -17,7 +17,7 @@ public class TurretBullet extends Projectile {
     super(type, level);
     this.noPhysics = false;
     dmg = 4f;
-    tickKill = 60;
+    tickKill = 100;
   }
 
   public void init(double dmg) {

@@ -28,15 +28,12 @@ public class RechargeVirtualAmmoBehavior extends ThrottleBehavior {
 	int dummy;
 	boolean recharging;
 	public RechargeVirtualAmmoBehavior(AbsAgentEntity agent, int baseCooldown, int varCooldown, Sensor<List<LivingEntity>> friendlyS) {
-		super(baseCooldown, varCooldown, agent);
+		super(agent, baseCooldown, varCooldown);
 		this.agent = agent;
 		this.friendlyS = friendlyS;
 	}
 
-	@Override
-	public boolean canUse() {
-		if (!super.canUse()) return false;
-		if (agent.getVirtualAmmo() >= agent.getMaxVirtualAmmo()){return false;}
+	protected boolean foundValidNearbyDisp(){
 		List<LivingEntity> all = friendlyS.get(agent.tickCount);
 		for (LivingEntity entity : all){
 			if (entity instanceof PortDisp portDisp){
@@ -48,20 +45,16 @@ public class RechargeVirtualAmmoBehavior extends ThrottleBehavior {
 		}
 		return false;
 	}
-
+	@Override
+	public boolean canUse() {
+		if (!super.canUse()) return false;
+		if (agent.getVirtualAmmo() >= agent.getMaxVirtualAmmo()){return false;}
+		return foundValidNearbyDisp();
+	}
 	public boolean canUseGoal() {
 		if (!super.canUse()) return false;
 		if (agent.getVirtualAmmo() > agent.getMaxVirtualAmmo()*0.8){return false;}
-		List<LivingEntity> all = friendlyS.get(agent.tickCount);
-		for (LivingEntity entity : all){
-			if (entity instanceof PortDisp portDisp){
-				if (portDisp.charge >= agent.getAmmoPerCharge()) {
-					target = portDisp;
-					return true;
-				}
-			}
-		}
-		return false;
+		return foundValidNearbyDisp();
 	}
 
 	public void start(){
@@ -84,6 +77,7 @@ public class RechargeVirtualAmmoBehavior extends ThrottleBehavior {
 			recharging = true;
 			agent.setAniMoveStatic(AnimationID.A_STATION_RELOAD);
 			PacketHandler.CHANNELS.send(PacketDistributor.TRACKING_ENTITY.with(() -> agent),new EntityRenderPacket(agent.getId(), 1));
+			target.setOpenNowIfPossible();
 			return false;
 		} else {
 			int tProg = agent.tickCount - dummy;

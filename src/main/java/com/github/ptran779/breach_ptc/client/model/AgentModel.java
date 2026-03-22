@@ -10,10 +10,12 @@ import java.util.HashMap;
 import java.util.Map;
 @OnlyIn(Dist.CLIENT)
 public class AgentModel extends PlayerModel<AbsAgentEntity>{
+	private ModelPart root;
   public final Map<String, ModelPart> BONE_PARTS = new HashMap<>();
 
   public AgentModel(ModelPart pRoot, boolean pSlim) {
     super(pRoot, pSlim);
+		this.root = pRoot;
     // code in the map for lookup:
     BONE_PARTS.put("Head", this.head);
     BONE_PARTS.put("Body", this.body);
@@ -22,6 +24,8 @@ public class AgentModel extends PlayerModel<AbsAgentEntity>{
     BONE_PARTS.put("LeftLeg", this.leftLeg);
     BONE_PARTS.put("RightLeg", this.rightLeg);
   }
+
+	public ModelPart getRoot(){return root;}
 
   public void setupAnim(AbsAgentEntity agent, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {}
 }

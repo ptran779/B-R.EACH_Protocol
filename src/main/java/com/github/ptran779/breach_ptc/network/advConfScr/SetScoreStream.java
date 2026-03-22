@@ -2,7 +2,9 @@ package com.github.ptran779.breach_ptc.network.advConfScr;
 
 
 import com.github.ptran779.breach_ptc.ai.api.ScoreCompiler;
+import com.github.ptran779.breach_ptc.ai.brain.AbsAgentBrain;
 import com.github.ptran779.breach_ptc.ai.brain.SwordBrain;
+import com.github.ptran779.breach_ptc.entity.agent.AbsAgentEntity;
 import com.github.ptran779.breach_ptc.entity.agent.Swordman;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -53,15 +55,15 @@ public class SetScoreStream {
 			if (player == null) return;
 			Entity entity = player.level().getEntity(entityId);
 			// Swap "AbstractAgentEntity" with whatever your actual base swordman class is
-			if (entity instanceof Swordman swordman) {
+			if (entity instanceof AbsAgentEntity agent) {
 				// "Ask the brain for public int getInputSpace()"
 				ScoreCompiler score = new ScoreCompiler(instructions, constants);
 				try{
-					score.validate(swordman.getSensorSize(), swordman.getScrCustVarSize());
-					SwordBrain brain = swordman.swordBrain;
+					score.validate(agent.getInputSpace(), agent.getCustSpace());
+					AbsAgentBrain brain = agent.getSuperBrain();
 					brain.scoreFunc = score;
 				} catch (RuntimeException exception){
-					LOGGER.warn("Someone trying to inject wrong score func on server for {}", swordman.getUUID());
+					LOGGER.warn("Someone trying to inject wrong score func on server for {}", agent.getUUID());
 				}
 			}
 		});

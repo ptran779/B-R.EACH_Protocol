@@ -23,7 +23,7 @@ public class RetreatBehavior extends ThrottleBehavior {
 	boolean brainMode = false;
 
 	public RetreatBehavior(int baseCooldown, int varCooldown, AbsAgentEntity agent, Sensor<List<LivingEntity>> nearbyDangerS, float awayDist, float minDistPerRun) {
-		super(baseCooldown, varCooldown, agent);
+		super(agent, baseCooldown, varCooldown);
 		this.agent = agent;
 		this.nearbyDangerS = nearbyDangerS;
 		this.awayDist = awayDist;
@@ -31,7 +31,7 @@ public class RetreatBehavior extends ThrottleBehavior {
 	}
 
 	public boolean canUse() {
-		if (!super.canUse()) return false;
+		if (!super.canUse() || agent.isPassenger()) return false;
 		towardPos = getNextPosition();
 		brainMode = true;
 		return towardPos != null;

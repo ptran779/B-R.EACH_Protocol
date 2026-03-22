@@ -84,13 +84,13 @@ public class AgentAdvanceConfigScreen extends AbstractContainerScreen<AgentAdvan
     chipConfigBut = new MultiOptionButton(this.leftPos+63, this.topPos+46, 76, 16, 0, 0, 16, BUTTON, 120, 64, bnt->{
 	    ItemStack stack = menu.getSlot(0).getItem();
 			if (stack.getItem() instanceof BrainChipItem brainChipItem) {
-		    if (menu.mlInput.get() != agent.getSensorSize() || menu.mlOutput.get() != agent.getBehaviorSize()) {
+		    if (menu.mlInput.get() != agent.getInputSpace() || menu.mlOutput.get() != agent.getOutputSpace()) {
 					if (chipConfigBut.option == 1) {
 						chipConfigBut.option = 2;
 						return;
 					}
 					//clean old brain if not match
-			    PacketHandler.CHANNELS.sendToServer(new CreateNewBrain(brainChipItem.getOrCreateUUID(stack),agent.getSensorSize(), agent.getBehaviorSize(), new byte[0]));
+			    PacketHandler.CHANNELS.sendToServer(new CreateNewBrain(brainChipItem.getOrCreateUUID(stack),agent.getInputSpace(), agent.getOutputSpace(), new byte[0]));
 		    }
 				PacketHandler.CHANNELS.sendToServer(new AgentBrainChipPacket(agent.getId(), brainChipItem.getOrCreateUUID(stack)));
 			}
@@ -130,7 +130,7 @@ public class AgentAdvanceConfigScreen extends AbstractContainerScreen<AgentAdvan
 		  try {
 			  costFuncBut.active = false;
 			  ScoreCompiler score = new ScoreCompiler(costFuncBox.getValue());
-				score.validate(agent.getSensorSize(), agent.getScrCustVarSize());
+				score.validate(agent.getInputSpace(), agent.getCustSpace());
 			  costFuncBut.option = 0;
 				PacketHandler.CHANNELS.sendToServer(new SetScoreStream(agent.getId(), score.getInstructions(), score.getConstants()));
 		  }
@@ -240,7 +240,7 @@ public class AgentAdvanceConfigScreen extends AbstractContainerScreen<AgentAdvan
 	  if (chipConfigBut.option != 2) {
 		  if (this.menu.getSlot(0).getItem().getItem() instanceof BrainChipItem) {
 			  chipConfigBut.active = true;
-			  if (this.menu.mlInput.get() == agent.getSensorSize() && this.menu.mlOutput.get() == agent.getBehaviorSize()) {
+			  if (this.menu.mlInput.get() == agent.getInputSpace() && this.menu.mlOutput.get() == agent.getOutputSpace()) {
 				  chipConfigBut.option = 3;
 			  } else {
 				  chipConfigBut.option = 1;

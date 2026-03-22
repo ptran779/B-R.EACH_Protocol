@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": ["iai", "bgb", "iai"],
+  "key": {
+    "i": { "item": "minecraft:iron_nugget" },
+    "a": { "item": "minecraft:blaze_powder" },
+    "b": { "item": "minecraft:coal" },
+    "g": { "item": "minecraft:gunpowder" }
+  },
+  "result": { "item": "breach_ptc:grenade_incendiary", "count": 1 },
+  "show_notification": true
+}

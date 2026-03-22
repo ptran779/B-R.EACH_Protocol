@@ -18,7 +18,6 @@ public class HellpodModel extends AbstractAniModel {
 	// This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
 	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(BreachPtc.MOD_ID, "hellpod_layer"), "main");
 
-
 	public HellpodModel(ModelPart root) {
 		super(RenderType::entityCutoutNoCull, root.getChild("Main"));
 

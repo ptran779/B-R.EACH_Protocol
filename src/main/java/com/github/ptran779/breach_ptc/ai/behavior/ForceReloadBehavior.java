@@ -58,7 +58,7 @@ public class ForceReloadBehavior extends Behavior {
 			agent.executeAmmoReloadMath();
 			return true;
 		}
-		return true; // Still reloading, keep the behavior alive
+		return false; // Still reloading, keep the behavior alive
   }
 
   public void stop(){

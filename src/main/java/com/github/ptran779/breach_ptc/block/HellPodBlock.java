@@ -1,5 +1,6 @@
 package com.github.ptran779.breach_ptc.block;
 
+import com.github.ptran779.breach_ptc.block_entity.HellPodBE;
 import com.github.ptran779.breach_ptc.server.BlockEntityInit;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;

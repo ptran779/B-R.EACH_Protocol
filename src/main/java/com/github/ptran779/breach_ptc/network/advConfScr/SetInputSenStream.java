@@ -1,6 +1,7 @@
 package com.github.ptran779.breach_ptc.network.advConfScr;
 
 import com.github.ptran779.breach_ptc.ai.brain.SwordBrain;
+import com.github.ptran779.breach_ptc.entity.agent.AbsAgentEntity;
 import com.github.ptran779.breach_ptc.entity.agent.Swordman;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -45,7 +46,7 @@ public class SetInputSenStream {
 			Entity entity = player.level().getEntity(entityId);
 
 			// Swap "AbstractAgentEntity" with whatever your actual base swordman class is
-			if (entity instanceof Swordman swordman) {
+			if (entity instanceof AbsAgentEntity agent) {
 				// "Ask the brain for public int getInputSpace()"
 				int brainSpace = SwordBrain.INPUT_SPACE;
 
@@ -55,7 +56,7 @@ public class SetInputSenStream {
 				int safeLength = Math.min(this.inLen, brainSpace);
 
 				for (int i = 0; i < safeLength; i++) {
-					swordman.swordBrain.inputDeviation[i] = this.dat[i];
+					agent.getSuperBrain().inputDeviation[i] = this.dat[i];
 				}
 			}
 		});

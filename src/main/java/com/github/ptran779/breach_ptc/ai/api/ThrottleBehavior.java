@@ -14,7 +14,7 @@ public abstract class ThrottleBehavior extends Behavior {
 	 * @param varCooldown The noise amplitude (0 to varCooldown). Added to base for variability.
 	 * @param entity The entity executing this behavior.
 	 */
-	public ThrottleBehavior(int baseCooldown, int varCooldown, Entity entity) {
+	public ThrottleBehavior(Entity entity, int baseCooldown, int varCooldown) {
 		this.entity = entity;
 		this.baseCooldown = baseCooldown;
 		this.varCooldown = varCooldown;

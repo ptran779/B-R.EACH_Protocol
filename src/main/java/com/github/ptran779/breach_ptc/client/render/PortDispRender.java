@@ -21,14 +21,13 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class PortDispRender extends EntityRenderer<PortDisp> {
   private static final ResourceLocation TEXTURE = new ResourceLocation(BreachPtc.MOD_ID, "textures/entities/portdisp.png");
   private final PortDispModel model;
-//  private final DBTurretReadyModel modelReady;
+	static float DEPLOY_LEN = PortDispAnimation.DEPLOY.lengthInSeconds();
+	static float STAY_OPEN_SEC = PortDisp.STAY_OPEN / 20f;
 
   public PortDispRender(EntityRendererProvider.Context pContext) {
     super(pContext);
     this.model = new PortDispModel(pContext.bakeLayer(PortDispModel.LAYER_LOCATION));
-//    this.modelReady = new DBTurretReadyModel(pContext.bakeLayer(DBTurretReadyModel.LAYER_LOCATION));
   }
-
   public void render(PortDisp disp, float pEntityYaw, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight) {
     pPoseStack.pushPose();
     // Positioning the model at the entity’s current coordinates
@@ -36,14 +35,12 @@ public class PortDispRender extends EntityRenderer<PortDisp> {
     pPoseStack.scale(-1F, -1F, 1F); // Flip model
     pPoseStack.mulPose(Axis.YP.rotationDegrees(180));
 
-    float aniTick = disp.tickCount - disp.timeTrigger + pPartialTick;
-    if (disp.getOpen()){
-      AnimationHelper.animate(model, PortDispAnimation.DEPLOY, aniTick / 20f, 1, false);
-    } else if (aniTick < PortDispAnimation.DEPLOY.lengthInSeconds() * 20) {
-      AnimationHelper.animate(model, PortDispAnimation.DEPLOY, PortDispAnimation.DEPLOY.lengthInSeconds() - aniTick  / 20f, 1, false);
-    } else {
-      model.getRoot().getAllParts().forEach(ModelPart::resetPose);  // clean animation
-    }
+	  float aniTime = (disp.tickCount - disp.getOpenTime() + pPartialTick) / 20f;
+	  if (aniTime < DEPLOY_LEN + STAY_OPEN_SEC) {
+		  AnimationHelper.animate(model, PortDispAnimation.DEPLOY, aniTime, 1, false);
+	  } else if (aniTime < (DEPLOY_LEN * 2) + STAY_OPEN_SEC) {
+			AnimationHelper.animate(model, PortDispAnimation.DEPLOY, 2*DEPLOY_LEN + STAY_OPEN_SEC - aniTime, 1, false);
+		} else {model.getRoot().getAllParts().forEach(ModelPart::resetPose);}
 
     VertexConsumer vertexConsumer = pBuffer.getBuffer(model.renderType(TEXTURE));
     model.renderToBuffer(pPoseStack, vertexConsumer, pPackedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);

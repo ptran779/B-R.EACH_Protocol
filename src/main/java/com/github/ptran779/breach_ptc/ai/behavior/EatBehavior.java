@@ -15,7 +15,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.PacketDistributor;
 
-public class EatBehavior extends Behavior {
+public class  EatBehavior extends Behavior {
   protected AbsAgentEntity agent;
   protected int food_val=0;
   protected Sensor<ItemStack> itemStackSensor;

@@ -13,64 +13,77 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 
 public final class EntityInit {
-  public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(Registries.ENTITY_TYPE, BreachPtc.MOD_ID);
+	public static final DeferredRegister<EntityType<?>> ENTITIES =
+		DeferredRegister.create(Registries.ENTITY_TYPE, BreachPtc.MOD_ID);
 
-  public static final RegistryObject<EntityType<Soldier>> SOLDIER = ENTITIES.register("soldier", () -> EntityType.Builder.of(Soldier::new, MobCategory.MISC).build(new ResourceLocation(
-	  BreachPtc.MOD_ID, "soldier").toString()));
-  public static final RegistryObject<EntityType<Sniper>> SNIPER = ENTITIES.register("sniper", () -> EntityType.Builder.of(Sniper::new, MobCategory.MISC).build(new ResourceLocation(
-	  BreachPtc.MOD_ID, "sniper").toString()));
-  public static final RegistryObject<EntityType<Heavy>> HEAVY = ENTITIES.register("heavy", () -> EntityType.Builder.of(Heavy::new, MobCategory.MISC).build(new ResourceLocation(
-	  BreachPtc.MOD_ID, "heavy").toString()));
-  public static final RegistryObject<EntityType<Demolition>> DEMOLITION = ENTITIES.register("demolition", () -> EntityType.Builder.of(Demolition::new, MobCategory.MISC).build(new ResourceLocation(
-	  BreachPtc.MOD_ID, "demolition").toString()));
-  public static final RegistryObject<EntityType<Medic>> MEDIC = ENTITIES.register("medic", () -> EntityType.Builder.of(Medic::new, MobCategory.MISC).build(new ResourceLocation(
-	  BreachPtc.MOD_ID, "medic").toString()));
-  public static final RegistryObject<EntityType<Engineer>> ENGINEER = ENTITIES.register("engineer", () -> EntityType.Builder.of(Engineer::new, MobCategory.MISC).build(new ResourceLocation(
-	  BreachPtc.MOD_ID, "engineer").toString()));
-  public static final RegistryObject<EntityType<Swordman>> SWORDMAN = ENTITIES.register("swordman", () -> EntityType.Builder.of(Swordman::new, MobCategory.MISC).build(new ResourceLocation(
-	  BreachPtc.MOD_ID, "swordman").toString()));
+	/// Combat Agent
+	public static final RegistryObject<EntityType<Soldier>> SOLDIER = ENTITIES.register("soldier",
+		() -> EntityType.Builder.of(Soldier::new, MobCategory.MISC)
+			.build(new ResourceLocation(BreachPtc.MOD_ID, "soldier").toString()));
+	public static final RegistryObject<EntityType<Sniper>> SNIPER = ENTITIES.register("sniper",
+		() -> EntityType.Builder.of(Sniper::new, MobCategory.MISC)
+			.build(new ResourceLocation(BreachPtc.MOD_ID, "sniper").toString()));
+	public static final RegistryObject<EntityType<Heavy>> HEAVY = ENTITIES.register("heavy",
+		() -> EntityType.Builder.of(Heavy::new, MobCategory.MISC)
+			.build(new ResourceLocation(BreachPtc.MOD_ID, "heavy").toString()));
+	public static final RegistryObject<EntityType<Demolition>> DEMOLITION = ENTITIES.register("demolition",
+		() -> EntityType.Builder.of(Demolition::new, MobCategory.MISC)
+			.build(new ResourceLocation(BreachPtc.MOD_ID, "demolition").toString()));
+	public static final RegistryObject<EntityType<Medic>> MEDIC = ENTITIES.register("medic",
+		() -> EntityType.Builder.of(Medic::new, MobCategory.MISC)
+			.build(new ResourceLocation(BreachPtc.MOD_ID, "medic").toString()));
+	public static final RegistryObject<EntityType<Engineer>> ENGINEER = ENTITIES.register("engineer",
+		() -> EntityType.Builder.of(Engineer::new, MobCategory.MISC)
+			.build(new ResourceLocation(BreachPtc.MOD_ID, "engineer").toString()));
+	public static final RegistryObject<EntityType<Swordman>> SWORDMAN = ENTITIES.register("swordman",
+		() -> EntityType.Builder.of(Swordman::new, MobCategory.MISC)
+			.build(new ResourceLocation(BreachPtc.MOD_ID, "swordman").toString()));
 
-  public static final RegistryObject<EntityType<FallingDropPod>> FALLING_DROP_POD =
-      ENTITIES.register("falling_drop_pod", () ->
-          EntityType.Builder.of(FallingDropPod::new, MobCategory.MISC)
-          .sized(1.0f, 1.5f)  // ← 1×1.5 block hit‐box so it’s clickable
-          .build(new ResourceLocation(BreachPtc.MOD_ID, "falling_drop_pod").toString()));
+	/// vehicle
+	public static final RegistryObject<EntityType<FallingDropPod>> FALLING_DROP_POD =
+		ENTITIES.register("falling_drop_pod", () -> EntityType.Builder.of(FallingDropPod::new, MobCategory.MISC)
+			.sized(1.0f, 1.5f)  // ← 1×1.5 block hit‐box so it’s clickable
+			.build(new ResourceLocation(BreachPtc.MOD_ID, "falling_drop_pod").toString()));
 
-  public static final RegistryObject<EntityType<FallingHellPod>> FALLING_HELL_POD =
-      ENTITIES.register("falling_hell_pod", () ->
-          EntityType.Builder.of(FallingHellPod::new, MobCategory.MISC)
-              .sized(1.0f, 1.5f)  // ← 1×1.5 block hit‐box so it’s clickable
-              .build(new ResourceLocation(BreachPtc.MOD_ID, "falling_hell_pod").toString()));
+	public static final RegistryObject<EntityType<FallingHellPod>> FALLING_HELL_POD =
+		ENTITIES.register("falling_hell_pod", () -> EntityType.Builder.of(FallingHellPod::new, MobCategory.MISC)
+			.sized(1.0f, 1.5f)  // ← 1×1.5 block hit‐box so it’s clickable
+			.build(new ResourceLocation(BreachPtc.MOD_ID, "falling_hell_pod").toString()));
 
-  public static final RegistryObject<EntityType<DBTurret>> BD_TURRET =
-      ENTITIES.register("db_turret", () ->
-          EntityType.Builder.of(DBTurret::new, MobCategory.MISC)
-              .sized(1.0f, 1.8f)  // ← 1×1.5 block hit‐box so it’s clickable
-              .build(new ResourceLocation(BreachPtc.MOD_ID, "db_turret").toString()));
-  public static final RegistryObject<EntityType<TurretBullet>> TURRET_BULLET = ENTITIES.register("turret_bullet",
-      () -> EntityType.Builder.of(TurretBullet::new, MobCategory.MISC)
-          .sized(0.125f, 0.125f)
-          .clientTrackingRange(64)
-          .updateInterval(1)
-          .build("turret_bullet"));
-  public static final RegistryObject<EntityType<PortDisp>> PORT_DISP =
-      ENTITIES.register("port_disp", () ->
-          EntityType.Builder.of(PortDisp::new, MobCategory.MISC)
-              .sized(1.0f, 1f)  // ← 1×1.5 block hit‐box so it’s clickable
-              .build(new ResourceLocation(BreachPtc.MOD_ID, "port_disp").toString()));
+	public static final RegistryObject<EntityType<VoidDrifterModule>> VOID_DRIFTER_MODULE_ENT =
+		ENTITIES.register("void_drifter_module", () -> EntityType.Builder.of(VoidDrifterModule::new, MobCategory.MISC)
+			.sized(3.0f, 3f)  // ← 1×1.5 block hit‐box so it’s clickable
+			.build(new ResourceLocation(BreachPtc.MOD_ID, "void_drifter_module").toString()));
 
-  public static final RegistryObject<EntityType<Grenade>> GRENADE =
-      ENTITIES.register("grenade", () ->
-          EntityType.Builder.of(Grenade::new, MobCategory.MISC)
-              .sized(0.3f, 0.3f)
-              .clientTrackingRange(64)
-              .build(new ResourceLocation(BreachPtc.MOD_ID, "grenade").toString())
-      );
+	public static final RegistryObject<EntityType<VoidDrifterPanel>> VOID_DRIFTER_PANEL =
+		ENTITIES.register("void_drifter_panel", () -> EntityType.Builder.of(VoidDrifterPanel::new, MobCategory.MISC)
+			.sized(1f, 1f)  // ← 1×1.5 block hit‐box so it’s clickable
+			.build(new ResourceLocation(BreachPtc.MOD_ID, "void_drifter_panel").toString()));
 
-  public static final RegistryObject<EntityType<VectorPursuer>> VECTOR_PURSUER =
-      ENTITIES.register("vector_pursuer", () ->
-          EntityType.Builder.of(VectorPursuer::new, MobCategory.MISC)
-              .sized(0.5f, 0.5f)
-              .build(new ResourceLocation(BreachPtc.MOD_ID, "vector_pursuer").toString())
-      );
+	public static final RegistryObject<EntityType<KSeedCore>> K_SEED_CORE_ENT =
+		ENTITIES.register("k_seed_core", () -> EntityType.Builder.of(KSeedCore::new, MobCategory.MISC)
+			.sized(1.0f, 1.5f)  // ← 1×1.5 block hit‐box so it’s clickable
+			.build(new ResourceLocation(BreachPtc.MOD_ID, "k_seed_core").toString()));
+
+
+	/// other
+	public static final RegistryObject<EntityType<DBTurret>> BD_TURRET = ENTITIES.register("db_turret",
+		() -> EntityType.Builder.of(DBTurret::new, MobCategory.MISC)
+			.sized(1.0f, 1.8f)  // ← 1×1.5 block hit‐box so it’s clickable
+			.build(new ResourceLocation(BreachPtc.MOD_ID, "db_turret").toString()));
+	public static final RegistryObject<EntityType<TurretBullet>> TURRET_BULLET = ENTITIES.register("turret_bullet",
+		() -> EntityType.Builder.of(TurretBullet::new, MobCategory.MISC).sized(0.125f, 0.125f).clientTrackingRange(64)
+			.updateInterval(1).build("turret_bullet"));
+	public static final RegistryObject<EntityType<PortDisp>> PORT_DISP = ENTITIES.register("port_disp",
+		() -> EntityType.Builder.of(PortDisp::new, MobCategory.MISC)
+			.sized(1.0f, 1f)  // ← 1×1.5 block hit‐box so it’s clickable
+			.build(new ResourceLocation(BreachPtc.MOD_ID, "port_disp").toString()));
+
+	public static final RegistryObject<EntityType<Grenade>> GRENADE = ENTITIES.register("grenade",
+		() -> EntityType.Builder.of(Grenade::new, MobCategory.MISC).sized(0.3f, 0.3f).clientTrackingRange(64)
+			.build(new ResourceLocation(BreachPtc.MOD_ID, "grenade").toString()));
+
+	public static final RegistryObject<EntityType<VectorPursuer>> VECTOR_PURSUER = ENTITIES.register("vector_pursuer",
+		() -> EntityType.Builder.of(VectorPursuer::new, MobCategory.MISC).sized(0.5f, 0.5f)
+			.build(new ResourceLocation(BreachPtc.MOD_ID, "vector_pursuer").toString()));
 }

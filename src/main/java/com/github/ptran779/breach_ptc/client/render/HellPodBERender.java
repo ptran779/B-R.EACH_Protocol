@@ -1,7 +1,7 @@
 package com.github.ptran779.breach_ptc.client.render;
 
 import com.github.ptran779.breach_ptc.BreachPtc;
-import com.github.ptran779.breach_ptc.block.HellPodBE;
+import com.github.ptran779.breach_ptc.block_entity.HellPodBE;
 import com.github.ptran779.breach_ptc.client.AnimationHelper;
 import com.github.ptran779.breach_ptc.client.ShareModel;
 import com.github.ptran779.breach_ptc.client.animation.HellPodAnimation;
@@ -35,7 +35,7 @@ public class HellPodBERender implements BlockEntityRenderer<HellPodBE> {
     poseStack.translate(0.5, 1.88125, 0.5);
     poseStack.scale(1.0F, -1.0F, 1.0F);  // Flip Y for Minecraft convention
 
-    float aniTick = (bEntity.stepCounter + partialTick);
+    float aniTick = (bEntity.tickcount + partialTick);
     AnimationHelper.animate(model, HellPodAnimation.DEPLOY2, aniTick / 20, 1, false);
 
     VertexConsumer builder = buffer.getBuffer(RenderType.entityCutoutNoCull(TEXTURE));

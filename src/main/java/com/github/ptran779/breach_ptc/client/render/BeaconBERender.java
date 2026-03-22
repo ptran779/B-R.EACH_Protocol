@@ -1,7 +1,7 @@
 package com.github.ptran779.breach_ptc.client.render;
 
 import com.github.ptran779.breach_ptc.BreachPtc;
-import com.github.ptran779.breach_ptc.block.BeaconBE;
+import com.github.ptran779.breach_ptc.block_entity.BeaconBE;
 import com.github.ptran779.breach_ptc.client.AnimationHelper;
 import com.github.ptran779.breach_ptc.client.animation.BeaconAnimation;
 import com.github.ptran779.breach_ptc.client.model.BeaconModel;

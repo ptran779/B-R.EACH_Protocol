@@ -18,4 +18,12 @@ public class AnimationID {
 	public static final int A_STATION_RELOAD = 10;
 
   public static final int A_BONK = 20;
+	public static final int A_BAND_AID = 21;
+	public static final int A_SYRINGE = 22;
+	public static final int A_VP_DEPLOY = 23;
+	public static final int A_THROW_GRENADE = 24;
+	public static final int A_PRECISION_SNIPE = 25;
+	public static final int A_SHIELD_DEPLOY = 26;
+	public static final int A_SHIELD_CHARGE = 27;
+	public static final int A_SHIELD_BONK = 28;
 }

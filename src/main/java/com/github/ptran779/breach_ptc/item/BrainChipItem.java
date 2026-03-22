@@ -64,8 +64,8 @@ public class BrainChipItem extends Item {
 
           // if mUnit already has IOsize, ignore. also, IO size of either 0 sound wrong bth
           if (mUnit.inSize == 0 || mUnit.outSize == 0) {
-            mUnit.inSize = agent.getSensorSize();
-            mUnit.outSize = agent.getBehaviorSize();
+            mUnit.inSize = agent.getInputSpace();
+            mUnit.outSize = agent.getOutputSpace();
             player.displayClientMessage(Component.literal("chip: " + modelUUID + " bound IO to " + agent.getAgentType()
                 + "class"), false);
 						// link it

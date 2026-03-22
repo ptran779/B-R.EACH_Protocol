@@ -1,8 +1,7 @@
 package com.github.ptran779.breach_ptc.network.agent;
 
-import com.github.ptran779.breach_ptc.ai.brain.SwordBrain;
+import com.github.ptran779.breach_ptc.ai.brain.AbsAgentBrain;
 import com.github.ptran779.breach_ptc.entity.agent.AbsAgentEntity;
-import com.github.ptran779.breach_ptc.entity.agent.Swordman;
 import com.github.ptran779.breach_ptc.entity.inventory.AgentAdvanceConfigMenu;
 import com.github.ptran779.breach_ptc.network.PacketHandler;
 import com.github.ptran779.breach_ptc.network.advConfScr.GetATrainConf;
@@ -58,8 +57,7 @@ public class AgentAdvanceConfigPacket {
         // Open screen and write the ID for the //client packet constructor
         NetworkHooks.openScreen(player, containerProvider, buf -> buf.writeInt(agent.getId()));
 				// init some update based for the container -- universalzied later -- fixme
-	      if (agent instanceof Swordman swordman){
-		      SwordBrain brain = swordman.swordBrain;
+		      AbsAgentBrain brain = agent.getSuperBrain();
 		      PacketHandler.CHANNELS.send(PacketDistributor.PLAYER.with(() -> player),
 			      new GetInputSenStream(brain.inputDeviation));
 					if (brain.scoreFunc != null){
@@ -69,7 +67,6 @@ public class AgentAdvanceConfigPacket {
 					}
 		      PacketHandler.CHANNELS.send(PacketDistributor.PLAYER.with(() -> player),
 			      new GetATrainConf(brain.autotrain, brain.getCollectExp(), brain.impTime, brain.exploreRate));
-	      }
       }
     });
     ctx.get().setPacketHandled(true);

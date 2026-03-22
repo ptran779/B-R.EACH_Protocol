@@ -4,6 +4,9 @@
     "breach_ptc:drop_pod_block",
     "breach_ptc:drop_pod_block_used",
     "breach_ptc:beacon_block",
-    "breach_ptc:beacon_block_unused"
+    "breach_ptc:beacon_block_unused",
+    "breach_ptc:k_seed_core_used_1",
+    "breach_ptc:k_seed_core_used_2",
+    "breach_ptc:k_seed_core_used_3"
   ]
 }

@@ -10,15 +10,36 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 
 public class BlockInit {
-  public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(Registries.BLOCK, BreachPtc.MOD_ID);
+	public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(Registries.BLOCK, BreachPtc.MOD_ID);
 
-  public static final RegistryObject<Block> DROP_POD = BLOCKS.register("drop_pod_block", () -> new DropPodBlock(BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(4.0F).noOcclusion()));
-  public static final RegistryObject<Block> DROP_POD_USED = BLOCKS.register("drop_pod_block_used", () -> new DropPodBlockUsed(BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(4.0F).noOcclusion()));
+	public static final RegistryObject<Block> DROP_POD = BLOCKS.register("drop_pod_block",
+		() -> new DropPodBlock(BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(4.0F).noOcclusion()));
+	public static final RegistryObject<Block> DROP_POD_USED = BLOCKS.register("drop_pod_block_used",
+		() -> new DropPodBlockUsed(BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(4.0F).noOcclusion()));
 
-  public static final RegistryObject<Block> HELL_POD = BLOCKS.register("hell_pod_block", () -> new HellPodBlock(BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(4.0F).noOcclusion()));
-  public static final RegistryObject<Block> HELL_POD_USED_BOT = BLOCKS.register("hell_pod_block_bot", () -> new HellPodBlockUsedBot(BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(4.0F).noOcclusion()));
-  public static final RegistryObject<Block> HELL_POD_USED_TOP = BLOCKS.register("hell_pod_block_top", () -> new HellPodBlockUsedTop(BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(4.0F).noOcclusion()));
+	public static final RegistryObject<Block> HELL_POD = BLOCKS.register("hell_pod_block",
+		() -> new HellPodBlock(BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(4.0F).noOcclusion()));
+	public static final RegistryObject<Block> HELL_POD_USED_BOT = BLOCKS.register("hell_pod_block_bot",
+		() -> new HellPodBlockUsedBot(
+			BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(4.0F).noOcclusion()));
+	public static final RegistryObject<Block> HELL_POD_USED_TOP = BLOCKS.register("hell_pod_block_top",
+		() -> new HellPodBlockUsedTop(
+			BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(4.0F).noOcclusion()));
 
-  public static final RegistryObject<Block> BEACON = BLOCKS.register("beacon_block", () -> new BeaconBlock(BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(4.0F).noOcclusion()));
-  public static final RegistryObject<Block> BEACON_UNUSED = BLOCKS.register("beacon_block_unused", () -> new BeaconBlockUnused(BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(4.0F).noOcclusion()));
+	public static final RegistryObject<Block> K_SEED_CORE = BLOCKS.register("k_seed_core",
+		() -> new KSeedCoreBlock(BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(4.0F).noOcclusion()));
+	public static final RegistryObject<Block> K_SEED_CORE_USED_1 = BLOCKS.register("k_seed_core_used_1",
+		() -> new KSeedCoreUsed1(
+			BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(4.0F).noOcclusion()));
+	public static final RegistryObject<Block> K_SEED_CORE_USED_2 = BLOCKS.register("k_seed_core_used_2",
+		() -> new KSeedCoreUsed2(
+			BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(4.0F).noOcclusion()));
+	public static final RegistryObject<Block> K_SEED_CORE_USED_3 = BLOCKS.register("k_seed_core_used_3",
+		() -> new KSeedCoreUsed3(
+			BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(4.0F).noOcclusion()));
+
+	public static final RegistryObject<Block> BEACON = BLOCKS.register("beacon_block",
+		() -> new BeaconBlock(BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(4.0F).noOcclusion()));
+	public static final RegistryObject<Block> BEACON_UNUSED = BLOCKS.register("beacon_block_unused",
+		() -> new BeaconBlockUnused(BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(4.0F).noOcclusion()));
 }

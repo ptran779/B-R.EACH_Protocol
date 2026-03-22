@@ -1,5 +1,6 @@
 package com.github.ptran779.breach_ptc.block;
 
+import com.github.ptran779.breach_ptc.block_entity.BeaconBE;
 import com.github.ptran779.breach_ptc.server.ItemInit;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;

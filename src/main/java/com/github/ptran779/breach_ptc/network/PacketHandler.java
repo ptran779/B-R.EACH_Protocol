@@ -6,6 +6,7 @@ import com.github.ptran779.breach_ptc.network.ml_packet.*;
 import com.github.ptran779.breach_ptc.network.agent.*;
 import com.github.ptran779.breach_ptc.network.player.CameraModePacket;
 //import com.github.ptran779.aegisops.network.player.KeyBindPacket;
+import com.github.ptran779.breach_ptc.network.player.KeyBindPacket;
 import com.github.ptran779.breach_ptc.network.player.serverConfigPacket;
 import com.github.ptran779.breach_ptc.network.render.EntityRenderPacket;
 import com.github.ptran779.breach_ptc.network.render.StructureRenderPacket;
@@ -56,7 +57,7 @@ public class PacketHandler {
 	  CHANNELS.registerMessage(id++, SetATrainConf.class, SetATrainConf::encode, SetATrainConf::decode, SetATrainConf::handle);
 
 		// key bind
-//		CHANNELS.registerMessage(id++, KeyBindPacket.class, KeyBindPacket::encode, KeyBindPacket::decode, KeyBindPacket::handle);
+		CHANNELS.registerMessage(id++, KeyBindPacket.class, KeyBindPacket::encode, KeyBindPacket::decode, KeyBindPacket::handle);
 
 		// Agent config
 		CHANNELS.registerMessage(id++, serverConfigPacket.class, serverConfigPacket::encode, serverConfigPacket::decode, serverConfigPacket::handle);

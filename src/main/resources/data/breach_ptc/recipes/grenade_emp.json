@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": ["iai", "bgb", "iai"],
+  "key": {
+    "i": { "item": "minecraft:iron_nugget" },
+    "a": { "item": "minecraft:redstone" },
+    "b": { "item": "minecraft:copper_ingot" },
+    "g": { "item": "minecraft:gunpowder" }
+  },
+  "result": { "item": "breach_ptc:grenade_emp", "count": 1 },
+  "show_notification": true
+}

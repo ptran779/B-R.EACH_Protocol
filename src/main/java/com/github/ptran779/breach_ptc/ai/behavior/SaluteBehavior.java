@@ -17,7 +17,7 @@ public class SaluteBehavior extends ThrottleBehavior {
   protected AbsAgentEntity agent;
 
   public SaluteBehavior(AbsAgentEntity agent, int cooldown, int varCooldown, Sensor<Player> bossS) {
-    super(cooldown, varCooldown, agent);
+    super(agent, cooldown, varCooldown);
     this.agent = agent;
     this.bossS = bossS;
   }

@@ -53,6 +53,9 @@ public final class ModClientEvents {
     public static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event){
         event.registerLayerDefinition(DropPodModel.LAYER_LOCATION, DropPodModel::createBodyLayer);
         event.registerLayerDefinition(HellpodModel.LAYER_LOCATION, HellpodModel::createBodyLayer);
+	      event.registerLayerDefinition(KSeedCoreModel.LAYER_LOCATION, KSeedCoreModel::createBodyLayer);
+	    event.registerLayerDefinition(VoidDrifterModuleModel.LAYER_LOCATION, VoidDrifterModuleModel::createBodyLayer);
+
         event.registerLayerDefinition(BeaconModel.LAYER_LOCATION, BeaconModel::createBodyLayer);
 
         event.registerLayerDefinition(PortDispModel.LAYER_LOCATION, PortDispModel::createBodyLayer);
@@ -68,20 +71,26 @@ public final class ModClientEvents {
     //Entity Render
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerEntityRenderer(EntityInit.SOLDIER.get(), AgentEntityRender::new);
-        event.registerEntityRenderer(EntityInit.SNIPER.get(), AgentEntityRender::new);
-        event.registerEntityRenderer(EntityInit.HEAVY.get(), AgentEntityRender::new);
-        event.registerEntityRenderer(EntityInit.DEMOLITION.get(), AgentEntityRender::new);
-        event.registerEntityRenderer(EntityInit.MEDIC.get(), AgentEntityRender::new);
-        event.registerEntityRenderer(EntityInit.ENGINEER.get(), AgentEntityRender::new);
-        event.registerEntityRenderer(EntityInit.SWORDMAN.get(), AgentEntityRender::new);
+      event.registerEntityRenderer(EntityInit.SOLDIER.get(), AgentEntityRender::new);
+      event.registerEntityRenderer(EntityInit.SNIPER.get(), AgentEntityRender::new);
+      event.registerEntityRenderer(EntityInit.HEAVY.get(), AgentEntityRender::new);
+      event.registerEntityRenderer(EntityInit.DEMOLITION.get(), AgentEntityRender::new);
+      event.registerEntityRenderer(EntityInit.MEDIC.get(), AgentEntityRender::new);
+      event.registerEntityRenderer(EntityInit.ENGINEER.get(), AgentEntityRender::new);
+      event.registerEntityRenderer(EntityInit.SWORDMAN.get(), AgentEntityRender::new);
 
-        event.registerBlockEntityRenderer(BlockEntityInit.BEACON_BE.get(), BeaconBERender::new) ;
-        event.registerBlockEntityRenderer(BlockEntityInit.DROP_POD_BE.get(), DropPodBERender::new);
-        event.registerEntityRenderer(EntityInit.FALLING_DROP_POD.get(), FallingDropPodRender::new);
-        event.registerBlockEntityRenderer(BlockEntityInit.HELL_POD_BE.get(), HellPodBERender::new);
-        event.registerEntityRenderer(EntityInit.FALLING_HELL_POD.get(), FallingHellPodRender::new);
-        event.registerEntityRenderer(EntityInit.BD_TURRET.get(), DBTurretRender::new);
+      event.registerBlockEntityRenderer(BlockEntityInit.BEACON_BE.get(), BeaconBERender::new) ;
+      event.registerBlockEntityRenderer(BlockEntityInit.DROP_POD_BE.get(), DropPodBERender::new);
+	    event.registerBlockEntityRenderer(BlockEntityInit.HELL_POD_BE.get(), HellPodBERender::new);
+	    event.registerBlockEntityRenderer(BlockEntityInit.K_SEED_CORE_BE.get(), KSeedCoreBERender::new);  // fixme
+
+	    event.registerEntityRenderer(EntityInit.FALLING_DROP_POD.get(), FallingDropPodRender::new);
+	    event.registerEntityRenderer(EntityInit.FALLING_HELL_POD.get(), FallingHellPodRender::new);
+	    event.registerEntityRenderer(EntityInit.VOID_DRIFTER_MODULE_ENT.get(), VoidDrifterModuleRender::new);
+	    event.registerEntityRenderer(EntityInit.VOID_DRIFTER_PANEL.get(), VoidDrifterPanelRender::new);
+	    event.registerEntityRenderer(EntityInit.K_SEED_CORE_ENT.get(), KSeedCoreRender::new);
+
+	    event.registerEntityRenderer(EntityInit.BD_TURRET.get(), DBTurretRender::new);
         event.registerEntityRenderer(EntityInit.TURRET_BULLET.get(), TurretBulletRender::new);
         event.registerEntityRenderer(EntityInit.PORT_DISP.get(), PortDispRender::new);
         event.registerEntityRenderer(EntityInit.GRENADE.get(), GrenadeEntityRender::new);

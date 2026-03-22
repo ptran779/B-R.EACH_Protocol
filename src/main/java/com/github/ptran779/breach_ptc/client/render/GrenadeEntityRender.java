@@ -1,6 +1,5 @@
 package com.github.ptran779.breach_ptc.client.render;
 
-import com.github.ptran779.breach_ptc.BreachPtc;
 import com.github.ptran779.breach_ptc.client.AnimationHelper;
 import com.github.ptran779.breach_ptc.client.ShareModel;
 import com.github.ptran779.breach_ptc.client.animation.GrenadeAnimation;
@@ -17,9 +16,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import static com.github.ptran779.breach_ptc.client.render.GrenadeItemRender.*;
+
 @OnlyIn(Dist.CLIENT)
 public class GrenadeEntityRender extends EntityRenderer<Grenade> {
-  protected static final ResourceLocation TEXTURE = new ResourceLocation(BreachPtc.MOD_ID, "textures/item/grenade.png");
   protected final GrenadeModel model;
 
   public GrenadeEntityRender(EntityRendererProvider.Context pContext) {
@@ -37,12 +37,19 @@ public class GrenadeEntityRender extends EntityRenderer<Grenade> {
       pPoseStack.mulPose(Axis.XP.rotationDegrees(90));
     }
     pPoseStack.translate(0, -1.625, 0);
-
-    VertexConsumer vertexConsumer = pBuffer.getBuffer(model.renderType(TEXTURE));
+		ResourceLocation texture = switch (pEntity.getGrenadeType()) {
+			case FRAG -> FRAG_TX;
+			case INCENDIARY -> INCENDIARY_TX;
+			case EMP -> EMP_TX;
+			case CORROSIVE -> CORROSIVE_TX;
+			case CRYO -> CRYO_TX;
+			case FLASHBANG -> FLASHBANG_TX;
+		};
+    VertexConsumer vertexConsumer = pBuffer.getBuffer(model.renderType(texture));
     model.renderToBuffer(pPoseStack, vertexConsumer, pPackedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
 
     pPoseStack.popPose();
   }
 
-  public ResourceLocation getTextureLocation(Grenade grenade) {return TEXTURE;}
+  public ResourceLocation getTextureLocation(Grenade grenade) {return FRAG_TX;}
 }

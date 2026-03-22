@@ -3,6 +3,7 @@ package com.github.ptran779.breach_ptc.client.screens;
 import com.github.ptran779.breach_ptc.BreachPtc;
 import com.github.ptran779.breach_ptc.client.widgets.ToggleButton;
 import com.github.ptran779.breach_ptc.entity.agent.AbsAgentEntity;
+import com.github.ptran779.breach_ptc.entity.api.EntityUtils;
 import com.github.ptran779.breach_ptc.entity.inventory.AgentInventoryMenu;
 import com.github.ptran779.breach_ptc.network.agent.*;
 import net.minecraft.client.Minecraft;
@@ -31,60 +32,79 @@ public class AgentInventoryScreen extends AbstractContainerScreen<AgentInventory
   private static final Font font = Minecraft.getInstance().font;
   private static final ResourceLocation CONTAINER_BACKGROUND = new ResourceLocation(BreachPtc.MOD_ID,"textures/gui/a_inv_scr.png");
   private static final ResourceLocation BUTTON = new ResourceLocation(BreachPtc.MOD_ID,"textures/gui/a_inv_but.png");
+	private static final int BUT_TEXT_LENGTH = 248;
+	private static final int BUT_TEXT_HEIGHT = 42;
   private final Player player;
   private final AbsAgentEntity agent;
-	ToggleButton wanderBut, followBut, hostileBut, humanoidBut, specialBut, fastFireBut;
+	ToggleButton wanderBut, followBut, hostileBut, humanoidBut, specialBut, fastFireBut, patrolBut, followOrderBut;
   DecimalFormat df = new DecimalFormat("#.#");
 
   protected void init(){
     super.init();
 
 		// creation
-	  wanderBut = new ToggleButton(this.leftPos + 227, this.topPos + 8, 31, 21,0, 0, 21, BUTTON, 186, 42,
+	  wanderBut = new ToggleButton(this.leftPos + 227, this.topPos + 8, 31, 21,0, 0, 21, BUTTON, BUT_TEXT_LENGTH, BUT_TEXT_HEIGHT,
         btn -> {
 	        wanderBut.flip();
 	        updateControlFlag1();
         }
     );
-	  followBut = new ToggleButton(this.leftPos + 261, this.topPos + 8, 31, 21,31, 0, 21, BUTTON, 186, 42,
+	  followBut = new ToggleButton(this.leftPos + 261, this.topPos + 8, 31, 21,31, 0, 21, BUTTON, BUT_TEXT_LENGTH, BUT_TEXT_HEIGHT,
 		  btn -> {
 			  followBut.flip();
 			  updateControlFlag1();
 				if (followBut.stateOn){CHANNELS.sendToServer(new AgentFollowTargetPacket(agent.getId(), player.getUUID()));}
 		  }
 	  );
-	  hostileBut = new ToggleButton(this.leftPos + 227, this.topPos + 32, 31, 21,62, 0, 21, BUTTON, 186, 42,
+	  hostileBut = new ToggleButton(this.leftPos + 227, this.topPos + 32, 31, 21,62, 0, 21, BUTTON, BUT_TEXT_LENGTH, BUT_TEXT_HEIGHT,
 		  btn -> {
 			  hostileBut.flip();
 			  updateControlFlag1();
 		  }
 	  );
-	  humanoidBut = new ToggleButton(this.leftPos + 261, this.topPos + 32, 31, 21,93, 0, 21, BUTTON, 186, 42,
+	  humanoidBut = new ToggleButton(this.leftPos + 261, this.topPos + 32, 31, 21,93, 0, 21, BUTTON, BUT_TEXT_LENGTH, BUT_TEXT_HEIGHT,
 		  btn -> {
 			  humanoidBut.flip();
 			  updateControlFlag1();
 		  }
 	  );
-	  specialBut = new ToggleButton(this.leftPos + 227, this.topPos + 56, 31, 21,124, 0, 21, BUTTON, 186, 42,
+	  specialBut = new ToggleButton(this.leftPos + 227, this.topPos + 56, 31, 21,124, 0, 21, BUTTON, BUT_TEXT_LENGTH, BUT_TEXT_HEIGHT,
 		  btn -> {
 			  specialBut.flip();
 			  updateControlFlag1();
 		  }
 	  );
-	  fastFireBut = new ToggleButton(this.leftPos + 261, this.topPos + 56, 31, 21,155, 0, 21, BUTTON, 186, 42,
+	  fastFireBut = new ToggleButton(this.leftPos + 261, this.topPos + 56, 31, 21,155, 0, 21, BUTTON, BUT_TEXT_LENGTH, BUT_TEXT_HEIGHT,
 		  btn -> {
 			  fastFireBut.flip();
 			  updateControlFlag1();
 		  }
 	  );
+	  patrolBut = new ToggleButton(this.leftPos + 227, this.topPos + 80, 31, 21,186, 0, 21, BUTTON, BUT_TEXT_LENGTH,
+		  BUT_TEXT_HEIGHT,
+		  btn -> {
+			  patrolBut.flip();
+			  updateControlFlag1();
+		  }
+	  );
+	  followOrderBut = new ToggleButton(this.leftPos + 261, this.topPos + 80, 31, 21, 217, 0, 21, BUTTON, BUT_TEXT_LENGTH,
+		  BUT_TEXT_HEIGHT,
+		  btn -> {
+			  followOrderBut.flip();
+			  updateControlFlag1();
+		  }
+	  );
+
 		// set base val
 	  int flag = agent.getControlFlg1();
-		wanderBut.stateOn = (flag & AbsAgentEntity.BF_WANDER) != 0;
-	  followBut.stateOn = (flag & AbsAgentEntity.BF_FOLLOW) != 0;
-	  hostileBut.stateOn = (flag & AbsAgentEntity.BF_TARGET_HOSTILE) != 0;
-	  humanoidBut.stateOn = (flag & AbsAgentEntity.BF_TARGET_AGENT) != 0;
-	  specialBut.stateOn = (flag & AbsAgentEntity.BF_ALLOW_SPECIAL) != 0;
-	  fastFireBut.stateOn = (flag & AbsAgentEntity.BF_RAPID_SHOOTING) != 0;
+		wanderBut.stateOn = (flag & EntityUtils.BF_WANDER) != 0;
+	  followBut.stateOn = (flag & EntityUtils.BF_FOLLOW) != 0;
+	  hostileBut.stateOn = (flag & EntityUtils.BF_TARGET_HOSTILE) != 0;
+	  humanoidBut.stateOn = (flag & EntityUtils.BF_TARGET_AGENT) != 0;
+	  specialBut.stateOn = (flag & EntityUtils.BF_ALLOW_SPECIAL) != 0;
+	  fastFireBut.stateOn = (flag & EntityUtils.BF_RAPID_SHOOTING) != 0;
+	  patrolBut.stateOn = (flag & EntityUtils.BF_PATROL) != 0;
+	  followOrderBut.stateOn = (flag & EntityUtils.BF_FOLLOW_GROUP_ORDER) != 0;
 	  // set tooltip
 	  wanderBut.setTooltip(Tooltip.create(Component.literal("Toggle Wandering")));
 	  followBut.setTooltip(Tooltip.create(Component.literal("Toggle Follow")));
@@ -92,6 +112,8 @@ public class AgentInventoryScreen extends AbstractContainerScreen<AgentInventory
 	  humanoidBut.setTooltip(Tooltip.create(Component.literal("Toggle Target Humanoid")));
 	  specialBut.setTooltip(Tooltip.create(Component.literal("Toggle Allow Special")));
 	  fastFireBut.setTooltip(Tooltip.create(Component.literal("Toggle Fast Firing")));
+	  patrolBut.setTooltip(Tooltip.create(Component.literal("Toggle On Patrol Mode")));
+	  followOrderBut.setTooltip(Tooltip.create(Component.literal("Toggle Follow Group Order")));
 	  //render
 		addRenderableWidget(wanderBut);
 	  addRenderableWidget(followBut);
@@ -99,6 +121,8 @@ public class AgentInventoryScreen extends AbstractContainerScreen<AgentInventory
 	  addRenderableWidget(humanoidBut);
 	  addRenderableWidget(specialBut);
 	  addRenderableWidget(fastFireBut);
+		addRenderableWidget(patrolBut);
+		addRenderableWidget(followOrderBut);
 
     PlainTextButton advancedConfBut = new PlainTextButton(this.leftPos + 205, this.topPos + 37,
         18, 18,Component.empty(),
@@ -128,13 +152,16 @@ public class AgentInventoryScreen extends AbstractContainerScreen<AgentInventory
   }
 
 	protected void updateControlFlag1(){
-		int newButtonFlags = agent.getControlFlg1() & ~0x3F;  // get rid of first 6 bit related to these // critical
-		if (wanderBut.stateOn)   newButtonFlags |= AbsAgentEntity.BF_WANDER;
-		if (followBut.stateOn)   newButtonFlags |= AbsAgentEntity.BF_FOLLOW;
-		if (hostileBut.stateOn)  newButtonFlags |= AbsAgentEntity.BF_TARGET_HOSTILE;
-		if (humanoidBut.stateOn) newButtonFlags |= AbsAgentEntity.BF_TARGET_AGENT;
-		if (specialBut.stateOn)  newButtonFlags |= AbsAgentEntity.BF_ALLOW_SPECIAL;
-		if (fastFireBut.stateOn) newButtonFlags |= AbsAgentEntity.BF_RAPID_SHOOTING;
+		int newButtonFlags = agent.getControlFlg1() & ~0xFF;  // get rid of first 8 bit related to these // critical
+		// update if need increase
+		if (wanderBut.stateOn)   newButtonFlags |= EntityUtils.BF_WANDER;
+		if (followBut.stateOn)   newButtonFlags |= EntityUtils.BF_FOLLOW;
+		if (hostileBut.stateOn)  newButtonFlags |= EntityUtils.BF_TARGET_HOSTILE;
+		if (humanoidBut.stateOn) newButtonFlags |= EntityUtils.BF_TARGET_AGENT;
+		if (specialBut.stateOn)  newButtonFlags |= EntityUtils.BF_ALLOW_SPECIAL;
+		if (fastFireBut.stateOn) newButtonFlags |= EntityUtils.BF_RAPID_SHOOTING;
+		if (patrolBut.stateOn) newButtonFlags |= EntityUtils.BF_PATROL;
+		if (followOrderBut.stateOn) newButtonFlags |= EntityUtils.BF_FOLLOW_GROUP_ORDER;
 
 		CHANNELS.sendToServer(new AgentConFlg1Packet(agent.getId(), newButtonFlags));
 	}
@@ -178,9 +205,9 @@ public class AgentInventoryScreen extends AbstractContainerScreen<AgentInventory
   protected void renderTooltip(GuiGraphics pGuiGraphics, int x, int y) {
     super.renderTooltip(pGuiGraphics, x, y);
     // Example condition — replace with hover bounds check
-    if (isHovering(x, y, this.leftPos + 227, this.topPos + 94, 65,25)) {
+    if (isHovering(x, y, this.leftPos + 227, this.topPos + 104, 65, 21)) {
       pGuiGraphics.renderTooltip(font, Component.literal("Virtual Ammo"), x, y);
-    } else if (isHovering(x, y, this.leftPos + 227, this.topPos + 123, 65,25)) {
+    } else if (isHovering(x, y, this.leftPos + 227, this.topPos + 127, 65, 21)) {
       pGuiGraphics.renderTooltip(font, Component.literal("Food"), x, y);
     }
   }

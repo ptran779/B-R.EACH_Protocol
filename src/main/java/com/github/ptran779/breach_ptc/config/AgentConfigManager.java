@@ -174,13 +174,13 @@ public class AgentConfigManager {
   // Refactored server startup method to use the shared distribute method
   public static void serverGenerateDefault() {
     // 1. Generate files if missing
-    loadOrGenerateClassConfig("soldier", List.of(GunTabType.PISTOL, GunTabType.RIFLE, GunTabType.SMG), 100, 1);
-    loadOrGenerateClassConfig("sniper", List.of(GunTabType.PISTOL, GunTabType.RIFLE, GunTabType.SNIPER), 50, 3);
-    loadOrGenerateClassConfig("heavy", List.of(GunTabType.PISTOL, GunTabType.SHOTGUN, GunTabType.MG), 200, 2);
+    loadOrGenerateClassConfig("soldier", List.of(GunTabType.PISTOL, GunTabType.RIFLE, GunTabType.SMG, GunTabType.SHOTGUN), 200, 1);
+    loadOrGenerateClassConfig("sniper", List.of(GunTabType.PISTOL, GunTabType.RIFLE, GunTabType.SNIPER), 50, 2);
+    loadOrGenerateClassConfig("heavy", List.of(GunTabType.PISTOL, GunTabType.SHOTGUN, GunTabType.MG), 250, 1);
     loadOrGenerateClassConfig("demolition", List.of(GunTabType.PISTOL, GunTabType.SMG), 100, 1);
-    loadOrGenerateClassConfig("medic", List.of(GunTabType.PISTOL, GunTabType.SMG), 100, 1);
-    loadOrGenerateClassConfig("engineer", List.of(GunTabType.PISTOL, GunTabType.RIFLE), 100, 1);
-    loadOrGenerateClassConfig("swordman", List.of(GunTabType.PISTOL, GunTabType.SHOTGUN, GunTabType.RIFLE, GunTabType.SMG, GunTabType.MG, GunTabType.SNIPER), 50, 2);
+    loadOrGenerateClassConfig("medic", List.of(GunTabType.PISTOL, GunTabType.SMG), 80, 1);
+    loadOrGenerateClassConfig("engineer", List.of(GunTabType.PISTOL, GunTabType.RIFLE), 150, 1);
+    loadOrGenerateClassConfig("swordman", List.of(GunTabType.PISTOL, GunTabType.SHOTGUN, GunTabType.SMG), 50, 1);
 
     // 2. Distribute to classes
     distributeConfigs();

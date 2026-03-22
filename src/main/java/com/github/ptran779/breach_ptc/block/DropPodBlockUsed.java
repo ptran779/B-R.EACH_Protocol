@@ -1,5 +1,6 @@
 package com.github.ptran779.breach_ptc.block;
 
+import com.github.ptran779.breach_ptc.block_entity.DropPodBE;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;

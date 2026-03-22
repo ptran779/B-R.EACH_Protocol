@@ -44,6 +44,8 @@ public class AgentAdvanceConfigMenu extends AbstractContainerMenu implements Con
 
     private void loadInventoryMenu() {
       this.addSlot(new BrainChipSlot(this.agentInv, 0, 14, 87));
+	    this.addSlot(new PatrolListSlot(this.agentInv, 1, 34, 87));
+
       //player hotbar
       for (int c = 0; c < 9; c++) {
           this.addSlot(new Slot(this.playerInv, c, 61 + c * 18, 149));

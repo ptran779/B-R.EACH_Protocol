@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " t ",
+    "coc"
+  ],
+  "key": {
+    "t": {
+      "item": "minecraft:redstone_torch"
+    },
+    "c": {
+      "item": "minecraft:cyan_dye"
+    },
+    "o": {
+      "item": "minecraft:compass"
+    }
+  },
+  "result": {
+    "item": "breach_ptc:patrol_list",
+    "count": 1
+  },
+  "show_notification": true
+}

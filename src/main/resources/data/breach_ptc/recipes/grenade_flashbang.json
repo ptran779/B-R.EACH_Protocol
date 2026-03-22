@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": ["iai", "bgb", "iai"],
+  "key": {
+    "i": { "item": "minecraft:iron_nugget" },
+    "a": { "item": "minecraft:glowstone_dust" },
+    "b": { "item": "minecraft:white_dye" },
+    "g": { "item": "minecraft:gunpowder" }
+  },
+  "result": { "item": "breach_ptc:grenade_flashbang", "count": 1 },
+  "show_notification": true
+}

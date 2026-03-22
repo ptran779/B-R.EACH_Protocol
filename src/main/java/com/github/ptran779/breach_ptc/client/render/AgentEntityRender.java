@@ -43,8 +43,10 @@ public class AgentEntityRender extends HumanoidMobRenderer<AbsAgentEntity, Agent
   @Override
   public void render(AbsAgentEntity agent, float pEntityYaw, float partialTicks, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight) {
     this.model = agent.getFemale() ? slimModel : standardModel;
+		boolean renderGunArm = false;
+
     // pose reset
-    for (ModelPart part : model.BONE_PARTS.values()) {part.resetPose();}
+	  model.getRoot().getAllParts().forEach(ModelPart::resetPose);
 
     //attack ani
     float aniTime = (agent.tickCount - agent.renderTimeTrigger + partialTicks)/20f;
@@ -59,45 +61,46 @@ public class AgentEntityRender extends HumanoidMobRenderer<AbsAgentEntity, Agent
           aniTime, agent.getAniMoveTimeTran(),
           model.BONE_PARTS);
     } else {
-      if (agent.getAniMovePoseStart() == AnimationID.A_LIVING){
-        // speed dictation
-        double speed = agent.getDeltaMovement().horizontalDistanceSqr(); // X² + Z²
-        if (speed > 0.015) {AnimationHelper.animateHumanoid(model,AnimationLibrary.get(AnimationID.A_RUN), model.BONE_PARTS,aniTime,1,true);
-        } else if (speed > 0.001) {
-          AnimationHelper.animateHumanoid(model,AnimationLibrary.get(AnimationID.A_WALK), model.BONE_PARTS,aniTime, 1, true);
-        } else if (Math.abs(Mth.wrapDegrees(agent.yBodyRot - agent.yBodyRotO)) > 0.0001f) {
-	        AnimationHelper.animateHumanoid(model, AnimationLibrary.get(AnimationID.A_ROTATE), model.BONE_PARTS, aniTime, 1, true);
-        } else {
-	        AnimationHelper.animateHumanoid(model, AnimationLibrary.get(AnimationID.A_IDLE), model.BONE_PARTS, aniTime, 1, true);
-        }
-        // gun holding
-        if (agent.getMainHandItem().getItem() instanceof ModernKineticGunItem) {
-          model.rightArm.yRot = model.head.yRot;
-          model.leftArm.yRot = 0.7F + model.head.yRot;
-          // tilt correction
-          model.rightArm.xRot = (-(float) Math.PI / 2F) + model.head.xRot;
-          model.leftArm.xRot = (-(float) Math.PI / 2F) + model.head.xRot;
-          model.leftSleeve.copyFrom(model.leftArm);
-          model.rightSleeve.copyFrom(model.rightArm);
-        }
+      if (!(agent.getAniMovePoseStart() == AnimationID.A_LIVING)){
+	      AnimationHelper.animateHumanoid(model,
+		      AnimationLibrary.get(agent.getAniMovePoseStart()), model.BONE_PARTS, aniTime, 1,
+		      agent.getAniMovePoseStart() == AnimationID.A_SHIELD_CHARGE);
       } else {
-        AnimationHelper.animateHumanoid(model,
-            AnimationLibrary.get(agent.getAniMovePoseStart()),
-            model.BONE_PARTS,
-            aniTime,
-            1,
-            false
-        );
+	      // speed dictation
+	      double speed = agent.getDeltaMovement().horizontalDistanceSqr(); // X² + Z²
+	      if (speed > 0.015) {AnimationHelper.animateHumanoid(model, AnimationLibrary.get(AnimationID.A_RUN),
+		      model.BONE_PARTS,aniTime,1,true);
+	      } else if (speed > 0.001) {
+		      AnimationHelper.animateHumanoid(model, AnimationLibrary.get(AnimationID.A_WALK), model.BONE_PARTS,aniTime,
+			      1, true);
+	      } else if (Math.abs(Mth.wrapDegrees(agent.yBodyRot - agent.yBodyRotO)) > 0.0001f) {
+		      AnimationHelper.animateHumanoid(model, AnimationLibrary.get(AnimationID.A_ROTATE), model.BONE_PARTS, aniTime, 1, true);
+	      } else {
+		      AnimationHelper.animateHumanoid(model, AnimationLibrary.get(AnimationID.A_IDLE), model.BONE_PARTS, aniTime, 1, true);
+	      }
+	      // gun holding
+	      if (agent.getMainHandItem().getItem() instanceof ModernKineticGunItem) renderGunArm = true;
       }
     }
 
-    // render head looking
-    float headYaw = Mth.rotLerp(partialTicks, agent.yHeadRotO, agent.yHeadRot) - agent.yBodyRot;
-    float headPitch = Mth.lerp(partialTicks, agent.xRotO, agent.getXRot());
-    model.head.yRot += headYaw * (Mth.PI / 180F);
-    model.head.xRot += headPitch * (Mth.PI / 180F);
-    model.hat.copyFrom(model.head);
+	  // render head looking
+	  float headYaw = Mth.rotLerp(partialTicks, agent.yHeadRotO, agent.yHeadRot) - agent.yBodyRot;
+	  float headPitch = Mth.lerp(partialTicks, agent.xRotO, agent.getXRot());
+	  model.head.yRot += headYaw * (Mth.PI / 180F);
+	  model.head.xRot += headPitch * (Mth.PI / 180F);
+	  model.hat.copyFrom(model.head);
 
+		if (renderGunArm){
+			model.rightArm.yRot = model.head.yRot;
+			model.leftArm.yRot = 0.7F + model.head.yRot;
+			// tilt correction
+			model.rightArm.xRot = model.head.xRot + (-(float) Math.PI / 2F) ;
+			model.leftArm.xRot = model.head.xRot + (-(float) Math.PI / 2F) ;
+
+			model.leftSleeve.copyFrom(model.leftArm);
+			model.rightSleeve.copyFrom(model.rightArm);
+		}
+	  pPoseStack.scale(0.9375F, 0.9375F, 0.9375F);
     super.render(agent, pEntityYaw, partialTicks, pPoseStack, pBuffer, pPackedLight);
   }
 }

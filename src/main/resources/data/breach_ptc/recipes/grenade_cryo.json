@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": ["iai", "bgb", "iai"],
+  "key": {
+    "i": { "item": "minecraft:iron_nugget" },
+    "a": { "item": "minecraft:snow_block" },
+    "b": { "item": "minecraft:snow_block" },
+    "g": { "item": "minecraft:gunpowder" }
+  },
+  "result": { "item": "breach_ptc:grenade_cryo", "count": 1 },
+  "show_notification": true
+}

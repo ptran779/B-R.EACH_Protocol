@@ -23,8 +23,11 @@ public class CreativeTabInit {
         output.accept(ItemInit.MEDIC_SPAWN_EGG.get());
         output.accept(ItemInit.ENGINEER_SPAWN_EGG.get());
         output.accept(ItemInit.SWORDMAN_SPAWN_EGG.get());
+
         output.accept(ItemInit.DROP_POD_ITEM.get());
         output.accept(ItemInit.HELL_POD_ITEM.get());
+	      output.accept(ItemInit.K_SEED_CORE_ITEM.get());
+
         output.accept(ItemInit.BEACON_ITEM.get());
         output.accept(ItemInit.DB_TURRET_ITEM.get());
         output.accept(ItemInit.PORT_DISP_ITEM.get());
@@ -32,9 +35,16 @@ public class CreativeTabInit {
         output.accept(ItemInit.BANDAGE_ITEM.get());
         output.accept(ItemInit.MORPHINE_ITEM.get());
         output.accept(ItemInit.MODULAR_SHIELD_ITEM.get());
-        output.accept(ItemInit.GRENADE_ITEM.get());
+	      output.accept(ItemInit.GRENADE_FRAG_ITEM.get());
+	      output.accept(ItemInit.GRENADE_INCENDIARY_ITEM.get());
+	      output.accept(ItemInit.GRENADE_EMP_ITEM.get());
+	      output.accept(ItemInit.GRENADE_CORROSIVE_ITEM.get());
+	      output.accept(ItemInit.GRENADE_CRYO_ITEM.get());
+	      output.accept(ItemInit.GRENADE_FLASHBANG_ITEM.get());
+
         output.accept(ItemInit.VP_ITEM.get());
         output.accept(ItemInit.BRAIN_CHIP_ITEM.get());
+	      output.accept(ItemInit.PATROL_LIST_ITEM.get());
 				output.accept(ItemInit.THE_GREAT_DEBUG_STICK_ITEM.get());
         // Add more if needed
       }).build()
