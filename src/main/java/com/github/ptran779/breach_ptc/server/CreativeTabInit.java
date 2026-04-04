@@ -24,6 +24,14 @@ public class CreativeTabInit {
         output.accept(ItemInit.ENGINEER_SPAWN_EGG.get());
         output.accept(ItemInit.SWORDMAN_SPAWN_EGG.get());
 
+	      output.accept(ItemInit.SOLDIER_BADGE.get());
+	      output.accept(ItemInit.SNIPER_BADGE.get());
+	      output.accept(ItemInit.HEAVY_BADGE.get());
+	      output.accept(ItemInit.DEMOLITION_BADGE.get());
+	      output.accept(ItemInit.MEDIC_BADGE.get());
+	      output.accept(ItemInit.ENGINEER_BADGE.get());
+	      output.accept(ItemInit.SWORDMAN_BADGE.get());
+
         output.accept(ItemInit.DROP_POD_ITEM.get());
         output.accept(ItemInit.HELL_POD_ITEM.get());
 	      output.accept(ItemInit.K_SEED_CORE_ITEM.get());

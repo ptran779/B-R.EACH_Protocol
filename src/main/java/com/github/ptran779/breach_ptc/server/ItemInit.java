@@ -12,46 +12,49 @@ import net.minecraftforge.registries.RegistryObject;
 
 public final class ItemInit {
 	public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, BreachPtc.MOD_ID);
-
 	public static final RegistryObject<ForgeSpawnEggItem> SOLDIER_SPAWN_EGG = ITEMS.register("soldier_spawn_egg",
 		() -> new ForgeSpawnEggItem(EntityInit.SOLDIER, 0xFFFFFF, 0xFFFFFF, new Item.Properties().stacksTo(64)));
-
 	public static final RegistryObject<ForgeSpawnEggItem> SNIPER_SPAWN_EGG = ITEMS.register("sniper_spawn_egg",
 		() -> new ForgeSpawnEggItem(EntityInit.SNIPER, 0xFFFFFF, 0xFFFFFF, new Item.Properties().stacksTo(64)));
-
 	public static final RegistryObject<ForgeSpawnEggItem> HEAVY_SPAWN_EGG = ITEMS.register("heavy_spawn_egg",
 		() -> new ForgeSpawnEggItem(EntityInit.HEAVY, 0xFFFFFF, 0xFFFFFF, new Item.Properties().stacksTo(64)));
-
 	public static final RegistryObject<ForgeSpawnEggItem> DEMOLITION_SPAWN_EGG = ITEMS.register("demolition_spawn_egg",
 		() -> new ForgeSpawnEggItem(EntityInit.DEMOLITION, 0xFFFFFF, 0xFFFFFF, new Item.Properties().stacksTo(64)));
-
 	public static final RegistryObject<ForgeSpawnEggItem> MEDIC_SPAWN_EGG = ITEMS.register("medic_spawn_egg",
 		() -> new ForgeSpawnEggItem(EntityInit.MEDIC, 0xFFFFFF, 0xFFFFFF, new Item.Properties().stacksTo(64)));
-
 	public static final RegistryObject<ForgeSpawnEggItem> ENGINEER_SPAWN_EGG = ITEMS.register("engineer_spawn_egg",
 		() -> new ForgeSpawnEggItem(EntityInit.ENGINEER, 0xFFFFFF, 0xFFFFFF, new Item.Properties().stacksTo(64)));
-
 	public static final RegistryObject<ForgeSpawnEggItem> SWORDMAN_SPAWN_EGG = ITEMS.register("swordman_spawn_egg",
 		() -> new ForgeSpawnEggItem(EntityInit.SWORDMAN, 0xFFFFFF, 0xFFFFFF, new Item.Properties().stacksTo(64)));
 
+	public static final RegistryObject<Item> SOLDIER_BADGE =
+		ITEMS.register("soldier_badge", () -> new BadgeItem(new Item.Properties(), BadgeItem.BADGE_TYPE.soldier));
+	public static final RegistryObject<Item> MEDIC_BADGE =
+		ITEMS.register("medic_badge", () -> new BadgeItem(new Item.Properties(), BadgeItem.BADGE_TYPE.medic));
+	public static final RegistryObject<Item> HEAVY_BADGE =
+		ITEMS.register("heavy_badge", () -> new BadgeItem(new Item.Properties(), BadgeItem.BADGE_TYPE.heavy));
+	public static final RegistryObject<Item> SNIPER_BADGE =
+		ITEMS.register("sniper_badge", () -> new BadgeItem(new Item.Properties(), BadgeItem.BADGE_TYPE.sniper));
+	public static final RegistryObject<Item> ENGINEER_BADGE =
+		ITEMS.register("engineer_badge", () -> new BadgeItem(new Item.Properties(), BadgeItem.BADGE_TYPE.engineer));
+	public static final RegistryObject<Item> SWORDMAN_BADGE =
+		ITEMS.register("swordman_badge", () -> new BadgeItem(new Item.Properties(), BadgeItem.BADGE_TYPE.swordman));
+	public static final RegistryObject<Item> DEMOLITION_BADGE =
+		ITEMS.register("demolition_badge", () -> new BadgeItem(new Item.Properties(), BadgeItem.BADGE_TYPE.demolition));
+
 	public static final RegistryObject<Item> DROP_POD_ITEM =
 		ITEMS.register("drop_pod", () -> new DropPodItem(new Item.Properties()));
-
 	public static final RegistryObject<Item> HELL_POD_ITEM =
 		ITEMS.register("hell_pod", () -> new HellPodItem(new Item.Properties()));
-
 	public static final RegistryObject<Item> K_SEED_CORE_ITEM =
 		ITEMS.register("k_seed_core", () -> new KSeedCoreItem(new Item.Properties()));
 
 	public static final RegistryObject<Item> BEACON_ITEM =
 		ITEMS.register("beacon", () -> new BeaconItem(new Item.Properties()));
-
 	public static final RegistryObject<Item> DB_TURRET_ITEM =
 		ITEMS.register("db_turret", () -> new DBTurretItem(new Item.Properties()));
-
 	public static final RegistryObject<Item> PORT_DISP_ITEM =
 		ITEMS.register("port_disp", () -> new PortDispItem(new Item.Properties()));
-
 	public static final RegistryObject<Item> ENGI_HAMMER_ITEM =
 		ITEMS.register("engi_hammer", () -> new EngiHammerItem(new Item.Properties().stacksTo(1)));
 
@@ -61,22 +64,21 @@ public final class ItemInit {
 		ITEMS.register("morphine", () -> new MorphineItem(new Item.Properties()));
 	public static final RegistryObject<Item> MODULAR_SHIELD_ITEM =
 		ITEMS.register("modular_shield", () -> new ModularShieldItem(new Item.Properties().durability(600)));
-	public static final RegistryObject<Item> GRENADE_FRAG_ITEM = ITEMS.register("grenade_frag",
-		() -> new GrenadeItem(new Item.Properties(), Grenade.GrenadeType.FRAG));
-	public static final RegistryObject<Item> GRENADE_INCENDIARY_ITEM = ITEMS.register("grenade_incendiary",
-		() -> new GrenadeItem(new Item.Properties(), Grenade.GrenadeType.INCENDIARY));
-	public static final RegistryObject<Item> GRENADE_EMP_ITEM = ITEMS.register("grenade_emp",
-		() -> new GrenadeItem(new Item.Properties(), Grenade.GrenadeType.EMP));
-	public static final RegistryObject<Item> GRENADE_CORROSIVE_ITEM = ITEMS.register("grenade_corrosive",
-		() -> new GrenadeItem(new Item.Properties(), Grenade.GrenadeType.CORROSIVE));
-	public static final RegistryObject<Item> GRENADE_CRYO_ITEM = ITEMS.register("grenade_cryo",
-		() -> new GrenadeItem(new Item.Properties(), Grenade.GrenadeType.CRYO));
-	public static final RegistryObject<Item> GRENADE_FLASHBANG_ITEM = ITEMS.register("grenade_flashbang",
-		() -> new GrenadeItem(new Item.Properties(), Grenade.GrenadeType.FLASHBANG));
+	public static final RegistryObject<Item> GRENADE_FRAG_ITEM =
+		ITEMS.register("grenade_frag", () -> new GrenadeItem(new Item.Properties(), Grenade.GrenadeType.FRAG));
+	public static final RegistryObject<Item> GRENADE_INCENDIARY_ITEM =
+		ITEMS.register("grenade_incendiary", () -> new GrenadeItem(new Item.Properties(), Grenade.GrenadeType.INCENDIARY));
+	public static final RegistryObject<Item> GRENADE_EMP_ITEM =
+		ITEMS.register("grenade_emp", () -> new GrenadeItem(new Item.Properties(), Grenade.GrenadeType.EMP));
+	public static final RegistryObject<Item> GRENADE_CORROSIVE_ITEM =
+		ITEMS.register("grenade_corrosive", () -> new GrenadeItem(new Item.Properties(), Grenade.GrenadeType.CORROSIVE));
+	public static final RegistryObject<Item> GRENADE_CRYO_ITEM =
+		ITEMS.register("grenade_cryo", () -> new GrenadeItem(new Item.Properties(), Grenade.GrenadeType.CRYO));
+	public static final RegistryObject<Item> GRENADE_FLASHBANG_ITEM =
+		ITEMS.register("grenade_flashbang", () -> new GrenadeItem(new Item.Properties(), Grenade.GrenadeType.FLASHBANG));
 
 	public static final RegistryObject<Item> VP_ITEM =
 		ITEMS.register("vp_terminal", () -> new VPTerminalItem(new Item.Properties()));
-
 	public static final RegistryObject<Item> BRAIN_CHIP_ITEM =
 		ITEMS.register("brain_chip", () -> new BrainChipItem(new Item.Properties().stacksTo(1)));
 	public static final RegistryObject<Item> PATROL_LIST_ITEM =

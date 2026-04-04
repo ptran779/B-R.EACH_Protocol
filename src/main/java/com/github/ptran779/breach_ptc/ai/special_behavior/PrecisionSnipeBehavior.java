@@ -19,7 +19,7 @@ public class PrecisionSnipeBehavior extends CoolDownBehavior {
 	Sensor<Integer> ammoInChamberS;
 	Sensor<Float> gunDmg;
 	Sensor<Double> targetDistS;
-	Sensor<Boolean> targetLosS;
+	Sensor<Boolean> targetLosS, friendlyLOS;
 	double dropRS;
 	boolean prime;
 	boolean cleanup;
@@ -27,7 +27,7 @@ public class PrecisionSnipeBehavior extends CoolDownBehavior {
 	int tickProgress = 0;
 	public PrecisionSnipeBehavior(AbsAgentEntity agent, int baseCooldown, int varCooldown, int actionCooldown,
 	                              double dropR, Sensor<Integer> ammoInChamberS, Sensor<Float> gunDmg,
-	                              Sensor<Double> targetDistS, Sensor<Boolean> targetLosS) {
+	                              Sensor<Double> targetDistS, Sensor<Boolean> targetLosS, Sensor<Boolean> friendlyLOS) {
 		super(agent, baseCooldown, varCooldown, actionCooldown);
 		this.agent = agent;
 		this.dropRS = dropR * dropR;
@@ -35,6 +35,7 @@ public class PrecisionSnipeBehavior extends CoolDownBehavior {
 		this.gunDmg = gunDmg;
 		this.targetDistS = targetDistS;
 		this.targetLosS = targetLosS;
+		this.friendlyLOS = friendlyLOS;
 	}
 
 	public boolean canUse() {
@@ -91,6 +92,8 @@ public class PrecisionSnipeBehavior extends CoolDownBehavior {
 		}
 
 		if (dummy == 60) {
+			// emergency cleanup if there a friendly in LOS OR target hiding behind wall
+			if (!targetLosS.get(agent.tickCount) || friendlyLOS.get(agent.tickCount)) return true;
 			agent.shootingTick();
 			cleanup = true;
 			resetActionCoolDown();

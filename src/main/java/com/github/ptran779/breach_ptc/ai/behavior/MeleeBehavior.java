@@ -1,22 +1,26 @@
 package com.github.ptran779.breach_ptc.ai.behavior;
 
+import com.github.ptran779.breach_ptc.Utils;
 import com.github.ptran779.breach_ptc.ai.api.CombatBehavior;
 import com.github.ptran779.breach_ptc.ai.api.Sensor;
 import com.github.ptran779.breach_ptc.client.animation.AnimationID;
 import com.github.ptran779.breach_ptc.entity.agent.AbsAgentEntity;
 import com.github.ptran779.breach_ptc.network.PacketHandler;
 import com.github.ptran779.breach_ptc.network.render.EntityRenderPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.network.PacketDistributor;
 
 public class MeleeBehavior extends CombatBehavior {
   protected Sensor<Float> meleeIS;
 	protected Sensor<Double> targetDistS;
+	Sensor<Boolean> targetLOS;
 	protected LivingEntity target;
-  protected double meleeRS;
+  protected double meleeDashR, meleeFullRS;
   protected int sCount = -1;
 	protected int lastStuckTick=-PATH_COOLDOWN_FAILURE;  // if melee fails to reach target due to pathing, block it from running for a short
 	// time
@@ -25,14 +29,16 @@ public class MeleeBehavior extends CombatBehavior {
   private int dummy;
 	private boolean aniflag = false;  // animation flag, use to reset
 
-  protected double getAttackReachSqr(LivingEntity target) {return Math.pow((agent.getBbWidth() + target.getBbWidth())/2+2, 2);}
+  protected double getAttackReachSqr(LivingEntity target) {return Math.pow((agent.getBbWidth() + target.getBbWidth())/2+
+	  agent.getAttribute(ForgeMod.ENTITY_REACH.get()).getValue(), 2);}
 
-  public MeleeBehavior(AbsAgentEntity agent, double speedScale, double meleeR, double dropR, Sensor<Float> meleeIS,
-                       Sensor<Double> distS) {
+  public MeleeBehavior(AbsAgentEntity agent, double speedScale, double meleeDashR, double dropR, Sensor<Float> meleeIS,
+                       Sensor<Double> distS, Sensor<Boolean> targetLOS) {
     super(agent, dropR, speedScale);
     this.meleeIS = meleeIS;
-    this.meleeRS = meleeR*meleeR;
+    this.meleeDashR = meleeDashR;
 		this.targetDistS = distS;
+		this.targetLOS = targetLOS;
   }
 
   protected void fixRotation(){  // rotate the body identical to head to avoid award calculation
@@ -52,12 +58,14 @@ public class MeleeBehavior extends CombatBehavior {
 
 	public void start() {
     super.start();
+		meleeFullRS = meleeDashR + getAttackReachSqr(target);
 		lastStuckTick = 0;
 		dummy = agent.tickCount;
 		aniflag = false;
 		sCount = -1;
   }
 	public void stop(){
+		target = null;
 		agent.setAggressive(false);
 		agent.stopNav();
 		agent.setAniMoveStatic(AnimationID.A_LIVING);
@@ -82,7 +90,7 @@ public class MeleeBehavior extends CombatBehavior {
 
 		// approach target if far
 		if (sCount == -1) {
-			if (targetRS > meleeRS){
+			if (targetRS > meleeFullRS){
 				if (!agent.moveto(target, agent.getAttribute(Attributes.MOVEMENT_SPEED).getValue())){
 					lastStuckTick = agent.tickCount;
 					return true;
@@ -91,6 +99,7 @@ public class MeleeBehavior extends CombatBehavior {
 				}
 			}
 			else {
+				if (!targetLOS.get(agent.tickCount)) return true;
 				agent.stopNav();
 				dummy = agent.tickCount;
 				agent.setAniMoveStatic(AnimationID.A_TRIPLE_STRIKE);
@@ -159,7 +168,7 @@ public class MeleeBehavior extends CombatBehavior {
 		double originalBaseDmg = attackAttr.getBaseValue();
 
 		// --- MAIN TARGET CHECK ---
-		if (targetRS < getAttackReachSqr(target)) {
+		if (targetRS < getAttackReachSqr(target) && targetLOS.get(agent.tickCount)) {
 			if (sCount == 2) {attackAttr.setBaseValue(originalBaseDmg * 1.5D);}
 			if (agent.doHurtTarget(target)) {hitAny = true;}
 
@@ -177,9 +186,10 @@ public class MeleeBehavior extends CombatBehavior {
 			Vec3 lookVec = agent.getLookAngle().normalize();
 			var nearbyEntities = agent.level().getEntitiesOfClass(LivingEntity.class, hitBox, e -> e != agent && e != target && e.isAlive());
 			for (LivingEntity e : nearbyEntities) {
-				// Strict distance check just in case the bounding box grabbed a corner case
-				if (agent.distanceToSqr(e) > getAttackReachSqr(e)) continue;
-				if (agent.isAlly(e)) continue;
+				// filter
+				if (agent.distanceToSqr(e) > getAttackReachSqr(e) ||
+					agent.isAlly(e) ||
+					Utils.rayCastHit(agent.getEyePosition(), e.getEyePosition(), (ServerLevel) agent.level())) continue;
 
 				Vec3 dirToEntity = e.position().subtract(agent.position()).normalize();
 				if (lookVec.dot(dirToEntity) > 0.707) {

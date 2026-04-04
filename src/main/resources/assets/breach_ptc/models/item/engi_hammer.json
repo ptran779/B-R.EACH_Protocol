@@ -109,6 +109,11 @@
 			"rotation": [ 30, 225, 0 ],
 			"translation": [ 0, 0.1, 0 ],
 			"scale": [ 1, 1, 1 ]
+		},
+		"fixed": {
+			"rotation": [0, 0, 90],
+			"translation": [0, 0, 0],
+			"scale": [1, 1, 1]
 		}
 	},
 	"groups": [

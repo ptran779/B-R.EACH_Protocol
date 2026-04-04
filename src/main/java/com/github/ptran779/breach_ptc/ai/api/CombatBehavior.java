@@ -1,8 +1,9 @@
 package com.github.ptran779.breach_ptc.ai.api;
 
-import com.github.ptran779.breach_ptc.attribute.AgentAttribute;
 import com.github.ptran779.breach_ptc.client.animation.AnimationID;
 import com.github.ptran779.breach_ptc.entity.agent.AbsAgentEntity;
+
+import static net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_SPEED;
 
 // mostly support timing executing, cooldown method, and all of its thing
 public abstract class CombatBehavior extends Behavior {
@@ -18,7 +19,7 @@ public abstract class CombatBehavior extends Behavior {
   }
 
   protected void resetCooldown() {
-    attackCoolDown = (int) Math.max(1, (20 / (agent.getAttribute(AgentAttribute.AGENT_ATTACK_SPEED).getValue() * speedScale)));
+    attackCoolDown = (int) Math.max(1, (20 / (agent.getAttribute(ATTACK_SPEED).getValue() * speedScale)));
   }
 
   public void start(){

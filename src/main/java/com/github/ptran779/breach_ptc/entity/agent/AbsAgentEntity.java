@@ -10,6 +10,7 @@ import com.github.ptran779.breach_ptc.entity.inventory.AgentInventory;
 import com.github.ptran779.breach_ptc.entity.inventory.AgentInventoryMenu;
 import com.github.ptran779.breach_ptc.entity.api.IEntityRender;
 import com.github.ptran779.breach_ptc.entity.api.IEntityTeamNTarget;
+import com.github.ptran779.breach_ptc.item.BadgeItem;
 import com.github.ptran779.breach_ptc.item.BrainChipItem;
 import com.github.ptran779.breach_ptc.item.ModularShieldItem;
 import com.github.ptran779.breach_ptc.network.render.EntityRenderPacket;
@@ -58,7 +59,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
@@ -68,8 +71,8 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.github.ptran779.breach_ptc.attribute.AgentAttribute.*;
 import static com.github.ptran779.breach_ptc.entity.api.EntityUtils.BF_RAPID_SHOOTING;
+import static com.github.ptran779.breach_ptc.server.AttributeInit.WELL_FEED_SPEED_BOOST;
 import static com.tacz.guns.api.item.nbt.GunItemDataAccessor.GUN_ID_TAG;
 
 public abstract class AbsAgentEntity extends PathfinderMob implements InventoryCarrier, MenuProvider,
@@ -123,6 +126,8 @@ public abstract class AbsAgentEntity extends PathfinderMob implements InventoryC
 	private static final EntityDataAccessor<ItemStack> MELEE_STACK =
 		SynchedEntityData.defineId(AbsAgentEntity.class, EntityDataSerializers.ITEM_STACK);
 	private static final EntityDataAccessor<ItemStack> GUN_STACK =
+		SynchedEntityData.defineId(AbsAgentEntity.class, EntityDataSerializers.ITEM_STACK);
+	private static final EntityDataAccessor<ItemStack> SPECIAL_STACK =
 		SynchedEntityData.defineId(AbsAgentEntity.class, EntityDataSerializers.ITEM_STACK);
 
 	// Client animation flag
@@ -179,9 +184,14 @@ public abstract class AbsAgentEntity extends PathfinderMob implements InventoryC
 
 	///  mc entity based func
 	public static AttributeSupplier.Builder createAttributes() {
-		return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 20).add(Attributes.MOVEMENT_SPEED, 0.5)
-			.add(Attributes.JUMP_STRENGTH, 1).add(Attributes.FOLLOW_RANGE, 16).add(Attributes.ATTACK_DAMAGE, 1)
-			.add(AGENT_ATTACK_SPEED, 1);
+		return Mob.createMobAttributes()
+			.add(Attributes.MAX_HEALTH, 20)
+			.add(Attributes.MOVEMENT_SPEED, 0.5)
+			.add(Attributes.JUMP_STRENGTH, 1)
+			.add(Attributes.FOLLOW_RANGE, 16)
+			.add(Attributes.ATTACK_DAMAGE, 1)
+			.add(Attributes.ATTACK_SPEED, 4)
+			.add(ForgeMod.ENTITY_REACH.get(), 3);  // as long as player
 	}
 	protected void defineSynchedData() {
 		super.defineSynchedData();
@@ -203,6 +213,7 @@ public abstract class AbsAgentEntity extends PathfinderMob implements InventoryC
 		entityData.define(BRAIN_CHIP_STACK, ItemStack.EMPTY);
 		entityData.define(MELEE_STACK, ItemStack.EMPTY);
 		entityData.define(GUN_STACK, ItemStack.EMPTY);
+		entityData.define(SPECIAL_STACK, ItemStack.EMPTY);
 	}
 
 	public String getAgentType() {return "abstract agent";}
@@ -246,11 +257,13 @@ public abstract class AbsAgentEntity extends PathfinderMob implements InventoryC
 	public ItemStack getChipBrainStack() {return this.entityData.get(BRAIN_CHIP_STACK);}
 	public ItemStack getMeleeStack() {return this.entityData.get(MELEE_STACK);}
 	public ItemStack getGunStack() {return this.entityData.get(GUN_STACK);}
+	public ItemStack getSpecialStack() {return this.entityData.get(SPECIAL_STACK);}
 
 	public void updateBrainChipStack() {entityData.set(BRAIN_CHIP_STACK, inventory2.getItem(BRAIN_CHIP_SLOT));}
 	public void updateWeaponStack() {
 		entityData.set(MELEE_STACK, inventory1.getItem(MELEE_SLOT));
 		entityData.set(GUN_STACK, inventory1.getItem(GUN_SLOT));
+		entityData.set(SPECIAL_STACK, inventory1.getItem(SPECIAL_SLOT));
 	}
 
 	public abstract AgentConfig getAgentConfig();
@@ -313,7 +326,7 @@ public abstract class AbsAgentEntity extends PathfinderMob implements InventoryC
 
 		ShooterDataHolder dat = op.getDataHolder();
 		if (dat.reloadStateType.isReloading() || dat.isBolting) return false;
-		if (Utils.hasFriendlyInLineOfFire(this, getTarget())) return false;
+//		if (Utils.hasFriendlyInLineOfFire(this, getTarget())) return false;
 		if (op.getDataHolder().currentGunItem == null) {
 			op.draw(this::getMainHandItem);
 			return false;
@@ -552,7 +565,7 @@ public abstract class AbsAgentEntity extends PathfinderMob implements InventoryC
 
 	/// inventory & menu
 	public SimpleContainer getInventory() {return inventory1;}
-	public boolean wantsToPickUp(ItemStack pStack) {return true;}
+	public boolean wantsToPickUp(ItemStack pStack) {return false;}
 	protected void pickUpItem(@NotNull ItemEntity itemEntity) {
 		ItemStack input = itemEntity.getItem();
 		if (input.isEmpty()) return;
@@ -679,18 +692,6 @@ public abstract class AbsAgentEntity extends PathfinderMob implements InventoryC
 			}
 		}
 	}
-//	public InteractionResult mobInteract(Player player, InteractionHand hand) {
-//		if (!this.level().isClientSide()) {
-//			if (getBossUUID() == null) {
-//				setBossUUID(player.getUUID());
-//			}
-//			if (sameTeam(player)) {
-//				NetworkHooks.openScreen((ServerPlayer) player, this, buf -> buf.writeInt(this.getId()));
-//			}
-//		}
-//		return InteractionResult.SUCCESS;
-//	}
-
 	///  CRITICAL EXPERIMENTAL
 	public InteractionResult mobInteract(Player player, InteractionHand hand) {
 		ItemStack item = player.getItemInHand(hand);
@@ -700,6 +701,8 @@ public abstract class AbsAgentEntity extends PathfinderMob implements InventoryC
 			if (!this.level().isClientSide) this.setLeashedTo(player, true);
 			return InteractionResult.SUCCESS;
 		}
+		// badge
+		if (item.getItem() instanceof BadgeItem) {return InteractionResult.PASS;}
 
 		if (!this.level().isClientSide) {
 			if (getBossUUID() == null) setBossUUID(player.getUUID());
@@ -875,12 +878,25 @@ public abstract class AbsAgentEntity extends PathfinderMob implements InventoryC
 		this.setFood(this.getFood() - 1);
 		this.heal(1);
 	}
+	private void scanAndPickupItems() {  // some dumb ass optimization mod disables our pickup capability. screw them we'll tick ourselves
+		AABB searchBox = this.getBoundingBox().inflate(1.5D, 1.0D, 1.5D);
+		List<ItemEntity> nearbyItems = this.level().getEntitiesOfClass(ItemEntity.class, searchBox);
+
+		for (ItemEntity itemEntity : nearbyItems) {
+			// Skip dead items, empty items, or items a player just threw (pickup delay)
+			if (itemEntity.isRemoved() || itemEntity.getItem().isEmpty() || itemEntity.hasPickUpDelay()) {continue;}
+			pickUpItem(itemEntity);
+		}
+	}
 	public void tick() {
 		super.tick();
 		if (level().isClientSide()) return;
+		if (tickCount % 40 == 0) {
+			scanAndPickupItems();
+		}
 		if (tickCount % 80 == 0) {
 			var attr = getAttribute(Attributes.MOVEMENT_SPEED);
-			if (getFood() >= maxfood * 0.4) {
+			if (getFood() >= maxfood * 0.4) {  // maybe register as an effect ?
 				if (attr != null && !attr.hasModifier(WELL_FEED_SPEED_BOOST)) {
 					attr.addTransientModifier(WELL_FEED_SPEED_BOOST);
 				}

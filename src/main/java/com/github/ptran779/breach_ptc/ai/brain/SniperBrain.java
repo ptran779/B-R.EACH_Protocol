@@ -18,7 +18,7 @@ public class SniperBrain extends AbsAgentBrain {
 		super.behaviorInit();
 		precisionSnipeB = addBehavior(
 			new PrecisionSnipeBehavior(sniperAgent, 40, 10, 400, getLongRangeScan(), ammoInChamberS, gunDmgS, targetDistSqS,
-				targetLosS));
+				targetLosS, friendlyLosS));
 	}
 
 	/// static func array -- share across for masking usage
@@ -77,5 +77,4 @@ public class SniperBrain extends AbsAgentBrain {
 			modArr[i] = SENSOR_F.get(i).eval(this.sniperAgent, this);
 		}
 	}  // update payload
-
 }

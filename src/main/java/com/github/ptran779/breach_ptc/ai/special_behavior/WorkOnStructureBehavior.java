@@ -53,6 +53,7 @@ public class WorkOnStructureBehavior extends ThrottleBehavior {
 		tickProgress = -1;
 	}
 	public void stop() {
+		aStruct = null;
 		agent.setAniMoveStatic(AnimationID.A_LIVING);
 	}
 

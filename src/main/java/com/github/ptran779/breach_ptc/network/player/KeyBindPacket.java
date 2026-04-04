@@ -49,7 +49,7 @@ public class KeyBindPacket {
 
 						for (AbsAgentEntity agent : agents) {
 							int newFlg = agent.getControlFlg1();
-							if ((newFlg & EntityUtils.BF_FOLLOW_GROUP_ORDER) != 0 ) continue;
+							if ((newFlg & EntityUtils.BF_FOLLOW_GROUP_ORDER) == 0 ) continue;
 							if (follow) {
 								newFlg |= EntityUtils.BF_FOLLOW;
 							} else {
@@ -76,7 +76,7 @@ public class KeyBindPacket {
 						int tgMode = cap.getTargetMode();
 						for (AbsAgentEntity agent : agents) {
 							int newFlg = agent.getControlFlg1();
-							if ((newFlg & EntityUtils.BF_FOLLOW_GROUP_ORDER) != 0 ) continue;
+							if ((newFlg & EntityUtils.BF_FOLLOW_GROUP_ORDER) == 0 ) continue;
 							switch (tgMode) {
 								case 0 -> newFlg &= ~(EntityUtils.BF_TARGET_HOSTILE | EntityUtils.BF_TARGET_AGENT);
 								case 1 -> {
@@ -108,7 +108,7 @@ public class KeyBindPacket {
 
 						for (AbsAgentEntity agent : agents) {
 							int newFlg = agent.getControlFlg1();
-							if ((newFlg & EntityUtils.BF_FOLLOW_GROUP_ORDER) != 0 ) continue;
+							if ((newFlg & EntityUtils.BF_FOLLOW_GROUP_ORDER) == 0 ) continue;
 							if (special) {
 								newFlg |= EntityUtils.BF_ALLOW_SPECIAL;
 							} else {

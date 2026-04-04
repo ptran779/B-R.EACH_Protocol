@@ -16,7 +16,7 @@ public class HeavyBrain extends AbsAgentBrain {
 	int shieldChargeB;
 	protected void behaviorInit(){
 		super.behaviorInit();
-		shieldChargeB = addBehavior(new ShieldChargeBehavior(agent, 60, 20, 100, 400, hostileLongRS));
+		shieldChargeB = addBehavior(new ShieldChargeBehavior(agent, 60, 20, 400, 32, hostileLongRS, friendlyLosS));
 	}
 
 	/// static func array -- share across for masking usage

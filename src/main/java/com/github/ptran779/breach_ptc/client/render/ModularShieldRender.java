@@ -60,9 +60,13 @@ public class ModularShieldRender extends BlockEntityWithoutLevelRenderer {
         poseStack.translate(0.52, -0.45, 0.65);
         poseStack.mulPose(Axis.YP.rotationDegrees(-90)); // original right hand rotation
       }
-      default -> {
+      case GUI -> {
         poseStack.translate(0.5, 0, 0.6);
         poseStack.scale(0.6f, 0.6f, 0.6f);
+      }
+      default -> {
+        poseStack.translate(0.5, 0, 0.6);
+        poseStack.mulPose(Axis.YP.rotationDegrees(180));
       }
     }
     VertexConsumer consumer = buffer.getBuffer(RenderType.entityCutout(TEXTURE));

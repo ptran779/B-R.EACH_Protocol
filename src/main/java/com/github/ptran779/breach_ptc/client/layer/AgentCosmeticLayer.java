@@ -24,8 +24,9 @@ public class AgentCosmeticLayer extends RenderLayer<AbsAgentEntity, AgentModel> 
 		this.itemRenderer = itemRenderer;
 	}
 
-	@Override
-	public void render(PoseStack pose, MultiBufferSource buffer, int packedLight, AbsAgentEntity agent, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+	@Override public void render(PoseStack pose, MultiBufferSource buffer, int packedLight, AbsAgentEntity agent,
+	                             float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks,
+	                             float netHeadYaw, float headPitch) {
 		// chipper
 		ItemStack chip = agent.getChipBrainStack();
 		if (!chip.isEmpty()) {
@@ -36,27 +37,29 @@ public class AgentCosmeticLayer extends RenderLayer<AbsAgentEntity, AgentModel> 
 			pose.mulPose(Axis.YP.rotationDegrees(90f));
 			pose.scale(0.15F, 0.15F, 0.15F);
 
-			this.itemRenderer.renderStatic(chip, ItemDisplayContext.NONE, packedLight, OverlayTexture.NO_OVERLAY, pose, buffer, agent.level(), agent.getId());
+			this.itemRenderer.renderStatic(chip, ItemDisplayContext.NONE, packedLight, OverlayTexture.NO_OVERLAY, pose,
+				buffer, agent.level(), agent.getId());
 			pose.popPose();
 		}
 		// melee
 		ItemStack melee = agent.getMeleeStack();
-		if (!melee.isEmpty() && melee.getItem() != agent.getMainHandItem().getItem()){
+		if (!melee.isEmpty() && melee.getItem() != agent.getMainHandItem().getItem()) {
 			pose.pushPose();
 			this.getParentModel().body.translateAndRotate(pose);
-			pose.translate(0.35D, 0.7D, 0.0D);
+			pose.translate(0.30D, 0.7D, 0.0D);
 			pose.mulPose(Axis.XP.rotationDegrees(90f));
 			pose.mulPose(Axis.YP.rotationDegrees(90f));
 			pose.mulPose(Axis.YP.rotationDegrees(10f));
-			pose.scale(0.8F, 0.8F, 0.8F);
+			pose.scale(0.7F, 0.7F, 0.7F);
 
 			this.itemRenderer.renderStatic(melee, ItemDisplayContext.NONE, packedLight, OverlayTexture.NO_OVERLAY, pose, buffer, agent.level(), agent.getId());
 
 			pose.popPose();
 		}
+
 		// gun
 		ItemStack gun = agent.getGunStack();
-		if(!gun.isEmpty() && gun.getItem() != agent.getMainHandItem().getItem()){
+		if (!gun.isEmpty() && gun.getItem() != agent.getMainHandItem().getItem()) {
 			pose.pushPose();
 
 			this.getParentModel().body.translateAndRotate(pose);
@@ -69,37 +72,48 @@ public class AgentCosmeticLayer extends RenderLayer<AbsAgentEntity, AgentModel> 
 			this.itemRenderer.renderStatic(gun, ItemDisplayContext.NONE, packedLight, OverlayTexture.NO_OVERLAY, pose, buffer, agent.level(), agent.getId());
 			pose.popPose();
 		}
+
+		// special
+		ItemStack special = agent.getSpecialStack();
+		if (!special.isEmpty() && (
+			special.getItem() != agent.getMainHandItem().getItem() &&
+				special.getItem() != agent.getOffhandItem().getItem()
+		)) {
+			pose.pushPose();
+			pose.translate(-.1D, .6D, 0.2D);
+			pose.mulPose(Axis.YP.rotationDegrees(-30f));
+			pose.mulPose(Axis.ZP.rotationDegrees(180f));
+			pose.scale(0.7F, 0.7F, 0.7F);
+
+			this.itemRenderer.renderStatic(special, ItemDisplayContext.NONE, packedLight,
+				OverlayTexture.NO_OVERLAY, pose,
+				buffer, agent.level(), agent.getId());
+
+			pose.popPose();
+		}
 		// reload
 		float aniTime = (agent.tickCount - agent.renderTimeTrigger + partialTicks) / 20f;
 		if ((agent.getAniMovePoseStart() == A_RELOAD && aniTime >= 0.5 && aniTime <= 1) ||
-			agent.getAniMovePoseStart() == A_STATION_RELOAD && (
-				aniTime >= 0.75 && aniTime < 2.5 ||
-				aniTime >= 2.75 && aniTime < 3 ||
-				aniTime >= 3.25 && aniTime < 3.5)
-		) {
+			agent.getAniMovePoseStart() == A_STATION_RELOAD && (aniTime >= 0.75 && aniTime < 2.5 ||
+				aniTime >= 2.75 && aniTime < 3 || aniTime >= 3.25 && aniTime < 3.5)) {
 			// 1. ANCHOR TO THE ARM
 			// This moves the pivot to the shoulder/arm joint
 			this.getParentModel().leftArm.translateAndRotate(pose);
 			pose.translate(-0.4, 0, -0.75);
 			pose.pushPose();
-			pose.translate(0.5,0.5,0.5);
+			pose.translate(0.5, 0.5, 0.5);
 			pose.mulPose(Axis.XP.rotationDegrees(-90f));
 			pose.scale(0.5F, 0.5F, 0.5F);
-			pose.translate(-0.5,-0.5,-0.5);
+			pose.translate(-0.5, -0.5, -0.5);
 
-			var model = Minecraft.getInstance().getModelManager().
-				getModel(com.github.ptran779.breach_ptc.client.particle.MagazineParticle.MODEL_LOCATION);
+			var model = Minecraft.getInstance().getModelManager()
+				.getModel(com.github.ptran779.breach_ptc.client.particle.MagazineParticle.MODEL_LOCATION);
 			var vertexConsumer = buffer.getBuffer(net.minecraft.client.renderer.RenderType.solid());
 
-			Minecraft.getInstance().getBlockRenderer().getModelRenderer().renderModel(
-				pose.last(),
-				vertexConsumer,
-				null, // No block state needed for raw JSON models
-				model,
-				1.0F, 1.0F, 1.0F, // RGB (White = no tint)
-				packedLight,
-				OverlayTexture.NO_OVERLAY
-			);
+			Minecraft.getInstance().getBlockRenderer().getModelRenderer()
+				.renderModel(pose.last(), vertexConsumer, null, // No block state needed for raw JSON models
+					model, 1.0F, 1.0F, 1.0F, // RGB (White = no tint)
+					packedLight, OverlayTexture.NO_OVERLAY);
 
 			pose.popPose();
 		}

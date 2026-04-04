@@ -1,10 +1,8 @@
 package com.github.ptran779.breach_ptc.ai.behavior;
 
-import com.github.ptran779.breach_ptc.Utils;
 import com.github.ptran779.breach_ptc.ai.api.CombatBehavior;
 import com.github.ptran779.breach_ptc.ai.api.Sensor;
 import com.github.ptran779.breach_ptc.entity.agent.AbsAgentEntity;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 
@@ -25,6 +23,7 @@ public class GunBehavior extends CombatBehavior {
     this.friendlyLOS = friendlyLOS;
     this.shootRS = shootR*shootR;
 		this.targetDistS = distS;
+		this.targetLOS = targetLOS;
   }
 
   public void start(){
@@ -38,7 +37,7 @@ public class GunBehavior extends CombatBehavior {
 	  if (target == null || !target.isAlive() || !agent.inAggressive()) {return false;}
 	  targetRS = targetDistS.get(agent.tickCount);
 	  if (targetRS < 0) return false;
-		if (Utils.rayCastHit(agent.getEyePosition(), target.getEyePosition(), (ServerLevel) agent.level())) return false;  // sensor fixme
+		if (!targetLOS.get(agent.tickCount)) return false;
 	  return targetRS <= dropRS &&
 		  agent.inventory1.gunExist() && // need this fast check due to cant throttle. Other sensor support slow throttle with resolution
 		  (agent.getVirtualAmmo() > 0 || ammoInChamberS.get(agent.tickCount) > 0 || totalAmmoCountS.get(agent.tickCount) > 0);
@@ -78,7 +77,7 @@ public class GunBehavior extends CombatBehavior {
 				  resetCooldown();
 			  }  // make it wait before try to pull/prep gun again
 		  } else {
-			  if (!agent.shootingTick()) {
+			  if (friendlyLOS.get(agent.tickCount) || !agent.shootingTick()) {  // no friend in firing range pls
 				  firing = false;
 				  dummy = agent.tickCount;
 				  agent.postShoot();
@@ -91,6 +90,7 @@ public class GunBehavior extends CombatBehavior {
 
   public void stop(){
     super.stop();
+	  target = null;
     agent.postShoot();
 	  firing = false;
   }

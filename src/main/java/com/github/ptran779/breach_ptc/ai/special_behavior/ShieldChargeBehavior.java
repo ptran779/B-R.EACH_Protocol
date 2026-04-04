@@ -27,6 +27,7 @@ import static com.github.ptran779.breach_ptc.client.animation.AnimationID.*;
 public class ShieldChargeBehavior extends CoolDownBehavior {
 	AbsAgentEntity agent;
 	Sensor<List<LivingEntity>> hostileLongRS; //
+	Sensor<Boolean> friendlyLOS; //
 	double chargeRangeSq;
 	LivingEntity target;
 	int tickProgress;
@@ -34,11 +35,12 @@ public class ShieldChargeBehavior extends CoolDownBehavior {
 	List<LivingEntity> nearMark;
 
 	public ShieldChargeBehavior(AbsAgentEntity agent, int baseCooldown, int varCooldown, int actionCoolDown,
-	                            double chargeRange, Sensor<List<LivingEntity>> hostileLongRS) {
+	                            double chargeRange, Sensor<List<LivingEntity>> hostileLongRS, Sensor<Boolean> friendlyLOS) {
 		super(agent, baseCooldown, varCooldown, actionCoolDown);
 		this.agent = agent;
 		this.chargeRangeSq = chargeRange * chargeRange;
 		this.hostileLongRS = hostileLongRS;
+		this.friendlyLOS = friendlyLOS;
 	}
 
 	public boolean canUse() {
@@ -52,7 +54,8 @@ public class ShieldChargeBehavior extends CoolDownBehavior {
 		for (LivingEntity hostile : hostileNearby) {
 			if (!(hostile instanceof Mob mob) || !hostile.isAlive() || agent.distanceToSqr(hostile) >= chargeRangeSq) continue;
 			LivingEntity mobTarget = mob.getTarget();
-			if (mobTarget != null && agent.isAlly(mobTarget)) {
+			if (mobTarget != null && agent.isAlly(mobTarget) && !Utils.rayCastHit(agent.getEyePosition(), hostile.getEyePosition(),
+				(ServerLevel) agent.level())) {
 				target = hostile;
 				return true;
 			}
@@ -72,6 +75,8 @@ public class ShieldChargeBehavior extends CoolDownBehavior {
 			new EntityRenderPacket(agent.getId(), 1));
 	}
 	public void stop() {
+		agent.postShoot();
+		target = null;
 		agent.setAniMoveStatic(A_LIVING);
 		agent.setAggressive(false);
 		agent.isShieldActive = false;  // critical shield off
@@ -155,7 +160,7 @@ public class ShieldChargeBehavior extends CoolDownBehavior {
 						actionStage = 4;
 						tickProgress = agent.tickCount;
 						return false;
-					} else if (dummy == 45 || dummy == 55 || dummy == 65) agent.shootGun();
+					} else if ((dummy == 45 || dummy == 55 || dummy == 65) && !friendlyLOS.get(agent.tickCount)) agent.shootGun(); // add safety check
 					else if (dummy >= 75) {  // done
 						actionStage = 4;
 						tickProgress = agent.tickCount;

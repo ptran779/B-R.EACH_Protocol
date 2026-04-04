@@ -1,15 +1,12 @@
 package com.github.ptran779.breach_ptc.server;
 
-import com.github.ptran779.breach_ptc.BreachPtc;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.RegistryObject;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 
-import static com.github.ptran779.breach_ptc.attribute.AgentAttribute.AGENT_ATTACK_SPEED;
+import java.util.UUID;
 
 public class AttributeInit {
-  public static final DeferredRegister<Attribute> ATTRIBUTES = DeferredRegister.create(Registries.ATTRIBUTE, BreachPtc.MOD_ID);
-
-  public static final RegistryObject<Attribute> AGENT_ATTACK_SPEED_ATTR =ATTRIBUTES.register("agent_attack_speed", ()-> AGENT_ATTACK_SPEED);
+	/// Modifier
+	public static final AttributeModifier WELL_FEED_SPEED_BOOST =
+		new AttributeModifier(UUID.fromString("5f27715e-f97d-4266-a4a5-f76cf488414b"), "Well-fed speed boost", 0.20,
+			AttributeModifier.Operation.MULTIPLY_BASE);
 }

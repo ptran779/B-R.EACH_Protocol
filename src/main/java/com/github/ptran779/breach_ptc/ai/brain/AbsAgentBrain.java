@@ -63,10 +63,9 @@ public abstract class AbsAgentBrain extends Brain {
 		saluteB = addBehavior(new SaluteBehavior(agent, 100, 100, bossS));
 		wanderB = addBehavior(new WanderBehavior(agent, 200, 100));
 		patrolB = addBehavior(new PatrolBehavior(agent, 20, 0));
-		gunB = addBehavior(
-			new GunBehavior(agent, 2, getShootingRange(), 64, ammoInChamberS, totalAmmoCountS, friendlyLosS, targetDistSqS,
-				targetLosS));
-		meleeB = addBehavior(new MeleeBehavior(agent, 1, 3, 32, meleeDmgS, targetDistSqS));
+		gunB = addBehavior(new GunBehavior(agent, 2, getShootingRange(), 64, ammoInChamberS, totalAmmoCountS, friendlyLosS,
+			targetDistSqS,targetLosS));
+		meleeB = addBehavior(new MeleeBehavior(agent, 1, 3, 32, meleeDmgS, targetDistSqS, targetLosS));
 		retarAcqB = addBehavior(new AcquireRetaliationTargetBehavior(agent, 20, 10, 32, retarHostileS));
 		nearTarAcqB = addBehavior(new AcquireNearestTargetBehavior(agent, 20, 10, 64, nearestHostileS));
 		highTarAcqB = addBehavior(new AcquireHighestHealthTargetBehavior(agent, 20, 10, 64, highestHealthHostileS));
