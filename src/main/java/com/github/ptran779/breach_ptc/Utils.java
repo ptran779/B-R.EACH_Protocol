@@ -151,17 +151,37 @@ public class Utils {
 		return entities;
 	}
 
-	public static boolean hasFriendlyInLineOfFire(Mob user, LivingEntity target) {
+	public static boolean hasFriendlyInLineOfFire(Mob user, LivingEntity target, double range) {
 		if (!(user instanceof IEntityTeamNTarget userTeam)) return false;
 		if (target == null) return false;
+
 		Vec3 start = user.getEyePosition();
 		Vec3 end = target.getEyePosition();
 
-		AABB pathAABB = new AABB(start, end).inflate(0.5); // widen slightly for tall hitbox
-		List<LivingEntity> teammates = user.level().getEntitiesOfClass(LivingEntity.class, pathAABB,
-			other -> other != user && userTeam.isAlly(other) && other.getBoundingBox().clip(start, end).isPresent());
-		return !teammates.isEmpty();
+		// If range > 0, clip the check to only scan N blocks ahead
+		Vec3 scanEnd = (range > 0)
+			? start.add(end.subtract(start).normalize().scale(range))
+			: end;
+
+		AABB pathAABB = new AABB(start, scanEnd).inflate(0.5);
+
+		return user.level().getEntitiesOfClass(LivingEntity.class, pathAABB,
+				other -> other != user
+					&& userTeam.isAlly(other)
+					&& other.getBoundingBox().clip(start, scanEnd).isPresent())
+			.stream().findAny().isPresent(); // stop at first hit, no full list needed
 	}
+//	public static boolean hasFriendlyInLineOfFire(Mob user, LivingEntity target) {
+//		if (!(user instanceof IEntityTeamNTarget userTeam)) return false;
+//		if (target == null) return false;
+//		Vec3 start = user.getEyePosition();
+//		Vec3 end = target.getEyePosition();
+//
+//		AABB pathAABB = new AABB(start, end).inflate(0.5); // widen slightly for tall hitbox
+//		List<LivingEntity> teammates = user.level().getEntitiesOfClass(LivingEntity.class, pathAABB,
+//			other -> other != user && userTeam.isAlly(other) && other.getBoundingBox().clip(start, end).isPresent());
+//		return !teammates.isEmpty();
+//	}
 
 	//use for both client and server to help with setting default skin
 	public static String makeSafeSkinName(String rawFileName) {

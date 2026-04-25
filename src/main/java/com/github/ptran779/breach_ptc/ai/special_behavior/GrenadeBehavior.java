@@ -24,7 +24,7 @@ import net.minecraftforge.network.PacketDistributor;
 import static com.github.ptran779.breach_ptc.config.ServerConfig.VP_MIN_TARGET_HEALTH;
 
 public class GrenadeBehavior extends CoolDownBehavior {
-	public final double[] THROW_ANGLES = {15, 30, 45, 60, 75};
+	public final double[] THROW_ANGLES = {0, 15, 30, 45, 60, 75};
 	AbsAgentEntity agent;
 
 	int tickProgress = 0;

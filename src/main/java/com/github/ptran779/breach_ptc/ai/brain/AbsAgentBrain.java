@@ -42,7 +42,7 @@ public abstract class AbsAgentBrain extends Brain {
 
 	/// Sensor array
 	protected Sensor<Player> bossS;
-	protected Sensor<Boolean> friendlyLosS, targetLosS;
+	protected Sensor<Boolean> friendlyLosFastS, friendlyLosFullS, targetLosS;
 	protected Sensor<Double> targetDistSqS;
 	protected Sensor<List<LivingEntity>> liveEntShortRS, hostileShortRS, friendlyShortRS, liveEntLongRS, hostileLongRS;
 	protected Sensor<LivingEntity> retarHostileS, nearestHostileS, highestHealthHostileS;
@@ -63,7 +63,8 @@ public abstract class AbsAgentBrain extends Brain {
 		saluteB = addBehavior(new SaluteBehavior(agent, 100, 100, bossS));
 		wanderB = addBehavior(new WanderBehavior(agent, 200, 100));
 		patrolB = addBehavior(new PatrolBehavior(agent, 20, 0));
-		gunB = addBehavior(new GunBehavior(agent, 2, getShootingRange(), 64, ammoInChamberS, totalAmmoCountS, friendlyLosS,
+		gunB = addBehavior(new GunBehavior(agent, 2, getShootingRange(), 64, ammoInChamberS, totalAmmoCountS,
+			friendlyLosFastS,
 			targetDistSqS,targetLosS));
 		meleeB = addBehavior(new MeleeBehavior(agent, 1, 3, 32, meleeDmgS, targetDistSqS, targetLosS));
 		retarAcqB = addBehavior(new AcquireRetaliationTargetBehavior(agent, 20, 10, 32, retarHostileS));
@@ -136,7 +137,9 @@ public abstract class AbsAgentBrain extends Brain {
 		ammoInChamberS = new Sensor<>(() -> agent.inventory1.checkAmmoInChamber(), 20);
 		maxAmmoInChamberS = new Sensor<>(() -> agent.inventory1.maxAmmoInChamber(), 20);
 
-		friendlyLosS = new Sensor<>(() -> Utils.hasFriendlyInLineOfFire(agent, agent.getTarget()), 40);
+		friendlyLosFullS = new Sensor<>(() -> Utils.hasFriendlyInLineOfFire(agent, agent.getTarget(), -1), 40);
+		friendlyLosFastS = new Sensor<>(() -> Utils.hasFriendlyInLineOfFire(agent, agent.getTarget(), 5)
+			|| friendlyLosFullS.get(agent.tickCount), 10);
 		targetDistSqS = new Sensor<>(() -> {
 			LivingEntity target = agent.getTarget();
 			if (target != null && target.isAlive()) return agent.distanceToSqr(target);

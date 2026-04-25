@@ -313,7 +313,7 @@ public abstract class AbsAgentEntity extends PathfinderMob implements InventoryC
 		long fireCD = gundat.getShootInterval(this, fmode, gunStack);
 		tickFireCD = switch (fmode) {
 			case AUTO -> (int) (fireCD / 50 * 4);  //  full auto get 1/4 speed
-			case SEMI -> (int) (fireCD / 50 * 16);  //  semi stay at 1/16 speed
+			case SEMI -> (int) (fireCD / 50 * 12);  //  semi stay at 1/12 speed
 			case BURST -> (int) (fireCD / 50 * 12);  //  burst stay at 1/12 speed due to multi shot spray
 			case UNKNOWN -> 1000;
 		};
@@ -951,6 +951,7 @@ public abstract class AbsAgentEntity extends PathfinderMob implements InventoryC
 	public ItemStack getSpecialSlot() {return inventory1.getItem(SPECIAL_SLOT);}
 	// inv
 	public boolean isEquipableGun(ItemStack stack) {
+		if (!stack.hasTag()) return false;
 		CompoundTag nbt = stack.getOrCreateTag();
 		String gunId = nbt.getString(GUN_ID_TAG);
 		if (gunId.isEmpty()) return false;

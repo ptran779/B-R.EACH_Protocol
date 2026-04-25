@@ -190,7 +190,7 @@ public class DBTurret extends AbsAgentStruct implements IEntityTeamNTarget {
     // check ammo count
     if (charge <= 0) return;
     charge--;
-    if (Utils.hasFriendlyInLineOfFire(this, this.getTarget())) return;  // no firing with friend on the line
+    if (Utils.hasFriendlyInLineOfFire(this, this.getTarget(), -1)) return;  // no firing with friend on the line
 
     // pick the barrel
     boolean gunBarrel = !this.entityData.get(LEFT_BARREL);
