@@ -57,6 +57,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static com.github.ptran779.breach_ptc.Utils.summonerTest;
+import static com.github.ptran779.breach_ptc.config.ServerConfig.PLAYER_DROP_POD;
 import static com.github.ptran779.breach_ptc.network.PacketHandler.CHANNELS;
 import static com.github.ptran779.breach_ptc.server.EntityInit.*;
 
@@ -82,7 +83,7 @@ public class ForgeServerEvent {
 		MlModelManager.cleanAll();
 	}
 	@SubscribeEvent public static void onEntityJoinLevel(EntityJoinLevelEvent event) {
-		// let test this
+		// all hostile hunt the shit out of agents
 		if (event.getEntity() instanceof Monster mob) {
 			mob.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(mob, AbsAgentEntity.class, true,
 				e -> e instanceof AbsAgentEntity agent
@@ -218,17 +219,43 @@ public class ForgeServerEvent {
 			);
 		}
 
-		// 1st time joining get to be delivered in a hell pod :)
-		CompoundTag persistentData = player.getPersistentData();
-		CompoundTag data;
-		if (!persistentData.contains(Player.PERSISTED_NBT_TAG)) {
-			data = new CompoundTag();
-			persistentData.put(Player.PERSISTED_NBT_TAG, data);
-		} else {
-			data = persistentData.getCompound(Player.PERSISTED_NBT_TAG);
+		// 1st time joining get to be delivered in a hell pod :) UNLESS YOU BORING PPL DONT WANT TO
+		if (PLAYER_DROP_POD.get()){
+			CompoundTag persistentData = player.getPersistentData();
+			CompoundTag data;
+			if (!persistentData.contains(Player.PERSISTED_NBT_TAG)) {
+				data = new CompoundTag();
+				persistentData.put(Player.PERSISTED_NBT_TAG, data);
+			} else {
+				data = persistentData.getCompound(Player.PERSISTED_NBT_TAG);
+			}
+			if (!data.getBoolean("hasJoinedBefore")) {
+				data.putBoolean("hasJoinedBefore", true);
+
+				// 🚀 This is the first join!
+				player.sendSystemMessage(Component.literal("Welcome Survivor."));
+				// spawn pod, play sound, set tags, etc.
+
+				VoidDrifterModule voidDrifter = new VoidDrifterModule(VOID_DRIFTER_MODULE_ENT.get(), player.level());
+				voidDrifter.setPos(player.getX(), player.level().getMaxBuildHeight() - 1, player.getZ());
+				KSeedCore kSeedCore = new KSeedCore(K_SEED_CORE_ENT.get(), player.level());
+				kSeedCore.setPos(player.getX(), player.level().getMaxBuildHeight() - 1, player.getZ());
+				kSeedCore.startRiding(voidDrifter);
+				player.startRiding(kSeedCore, true);
+				float speed = 2;
+				// Random horizontal direction
+				float yaw = player.level().random.nextFloat() * 360F;
+				float yawRad = yaw * (float) (Math.PI / 180F);
+				voidDrifter.setDeltaMovement(Mth.sin(-yawRad) * speed, 0D, Mth.cos(yawRad) * speed);
+				player.level().addFreshEntity(voidDrifter);
+				player.level().addFreshEntity(kSeedCore);
+
+				CHANNELS.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) player), new CameraModePacket());
+			}
 		}
 
 		// fixme change this/update as needed
+		// warning message
 		player.sendSystemMessage(Component.literal("[B-R.EACH PROTOCOL (FORMALLY AEGIS OPS) BETA V.2] COMPLETE AI REWORK")
 			.withStyle(ChatFormatting.RED).withStyle(ChatFormatting.BOLD));
 		player.sendSystemMessage(
@@ -239,30 +266,6 @@ public class ForgeServerEvent {
 		player.sendSystemMessage(
 			Component.literal("You can get help in discord (link on B-REACH Protocol's modridth page).")
 				.withStyle(ChatFormatting.BLUE).withStyle(ChatFormatting.ITALIC));
-
-		if (!data.getBoolean("hasJoinedBefore")) {
-			data.putBoolean("hasJoinedBefore", true);
-
-			// 🚀 This is the first join!
-			player.sendSystemMessage(Component.literal("Welcome Survivor."));
-			// spawn pod, play sound, set tags, etc.
-
-			VoidDrifterModule voidDrifter = new VoidDrifterModule(VOID_DRIFTER_MODULE_ENT.get(), player.level());
-			voidDrifter.setPos(player.getX(), player.level().getMaxBuildHeight() - 1, player.getZ());
-			KSeedCore kSeedCore = new KSeedCore(K_SEED_CORE_ENT.get(), player.level());
-			kSeedCore.setPos(player.getX(), player.level().getMaxBuildHeight() - 1, player.getZ());
-			kSeedCore.startRiding(voidDrifter);
-			player.startRiding(kSeedCore, true);
-			float speed = 2;
-			// Random horizontal direction
-			float yaw = player.level().random.nextFloat() * 360F;
-			float yawRad = yaw * (float) (Math.PI / 180F);
-			voidDrifter.setDeltaMovement(Mth.sin(-yawRad) * speed, 0D, Mth.cos(yawRad) * speed);
-			player.level().addFreshEntity(voidDrifter);
-			player.level().addFreshEntity(kSeedCore);
-
-			CHANNELS.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) player), new CameraModePacket());
-		}
 	}
 
 	/// Telemetry command

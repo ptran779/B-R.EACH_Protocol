@@ -3,12 +3,12 @@ package com.github.ptran779.breach_ptc.entity.extra;
 import com.github.ptran779.breach_ptc.ai.other_goal.DronePursudeGoal;
 import com.github.ptran779.breach_ptc.entity.api.IEntityRender;
 import com.github.ptran779.breach_ptc.entity.api.IEntityTeamNTarget;
-import com.github.ptran779.breach_ptc.entity.structure.DBTurret;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.sounds.SoundEvent;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -23,8 +23,8 @@ import java.util.Collections;
 import java.util.UUID;
 
 public class VectorPursuer extends PathfinderMob implements IEntityRender, IEntityTeamNTarget {
-	public UUID deployerUUID = null;
-	public UUID bossUUID = null;
+	public LivingEntity deployer;
+	public UUID bossUUID = null;  // refer to player for team targeting logic
 	public int timeTrigger = 0;
 
 	// 1. Fixed the copy-paste class target for DataTracker
@@ -81,24 +81,26 @@ public class VectorPursuer extends PathfinderMob implements IEntityRender, IEnti
 		super.defineSynchedData();
 		entityData.define(DEPLOYED, false);
 	}
-
-	// 2. Fixed NBT Serialization bugs
 	public void addAdditionalSaveData(CompoundTag nbt) {
 		super.addAdditionalSaveData(nbt);
 		nbt.putBoolean("Deployed", this.getDeployed());
-		if (deployerUUID != null) nbt.putUUID("deployerUUID", deployerUUID);
+		if (deployer != null) nbt.putUUID("deployerUUID", deployer.getUUID());
 		if (bossUUID != null) nbt.putUUID("bossUUID", bossUUID);
 	}
-
-	@Override
 	public void readAdditionalSaveData(CompoundTag nbt) {
 		super.readAdditionalSaveData(nbt);
 		if (nbt.contains("Deployed")) this.setDeployed(nbt.getBoolean("Deployed"));
-		if (nbt.contains("deployerUUID")) deployerUUID = nbt.getUUID("deployerUUID");
+		if (nbt.contains("deployerUUID")) {
+			Entity dep = ((ServerLevel) level()).getEntity(nbt.getUUID("deployerUUID"));
+			if (dep instanceof LivingEntity depl) deployer = depl;
+		}
 		if (nbt.contains("bossUUID")) bossUUID = nbt.getUUID("bossUUID");
 	}
 
-	@Override
+	public void die(DamageSource source) {
+		super.die(source);
+		this.level().explode(deployer, getX(), getY(), getZ(), 4.0f, Level.ExplosionInteraction.NONE);
+	}
 	public void tick() {
 		super.tick();
 		if (!level().isClientSide()) {
@@ -122,71 +124,3 @@ public class VectorPursuer extends PathfinderMob implements IEntityRender, IEnti
 	public UUID getBossUUID() { return bossUUID; }
 	public int getControlFlg1() { return 0; }
 }
-
-//public class VectorPursuer extends FlyingMob implements IEntityRender, IEntityTeamNTarget {
-//  public UUID deployerUUID = null;
-//  public UUID bossUUID = null;
-//  public int timeTrigger = 0;
-//  public VectorPursuer(EntityType<? extends VectorPursuer> pEntityType, Level pLevel) {
-//    super(pEntityType, pLevel);
-//    this.moveControl = new FlyingMoveControl(this, 20, true);
-//  }
-//
-//  protected SoundEvent getAmbientSound() {
-//    return AMETHYST_BLOCK_CHIME; // or vanilla SoundEvents
-//  }
-//
-//  protected PathNavigation createNavigation(Level level) {
-//    return new FlyingPathNavigation(this, level);
-//  }
-//
-//  private static final EntityDataAccessor<Boolean> DEPLOYED = SynchedEntityData.defineId(DBTurret.class, EntityDataSerializers.BOOLEAN);
-//  public boolean getDeployed() {return entityData.get(DEPLOYED);}
-//  public void setDeployed(boolean flag) {entityData.set(DEPLOYED, flag);}
-//
-//  protected void defineSynchedData() {
-//    super.defineSynchedData();
-//    entityData.define(DEPLOYED, false);
-//  }
-//  public void addAdditionalSaveData(CompoundTag nbt){
-//    super.addAdditionalSaveData(nbt);
-//    nbt.putBoolean("Deployed", this.getDeployed());
-//    if (deployerUUID != null) {nbt.putUUID("deployerUUID", deployerUUID);}
-//    if (bossUUID != null) {nbt.putUUID("bossUUID", bossUUID);}
-//  }
-//  public void readAdditionalSaveData(CompoundTag nbt){
-//    super.readAdditionalSaveData(nbt);
-//    if (nbt.contains("Deployed")) {deployerUUID = nbt.getUUID("deployerUUID");}
-//    if (nbt.contains("BossUUID")) {bossUUID = nbt.getUUID("bossUUID");}
-//  }
-//  public static AttributeSupplier.Builder createAttributes() {
-//    return Mob.createLivingAttributes()
-//        .add(Attributes.MAX_HEALTH, 20.0)
-//        .add(Attributes.MOVEMENT_SPEED, 1)
-//        .add(Attributes.FLYING_SPEED, 1)
-//        .add(Attributes.ARMOR, 6)
-//        .add(Attributes.FOLLOW_RANGE, 32.0D);
-//  }
-//
-//  public void tick() {
-//    super.tick();
-//    if (!level().isClientSide()){
-//      if (!getDeployed()) {
-//        if (tickCount == 1) {setDeltaMovement(0, 0.5, 0);}
-//        else if (tickCount == 10) {
-//          setNoGravity(true);
-//          setDeployed(true);
-//          setDeltaMovement(0, 0, 0);
-//        }
-//      }
-//    }
-//  }
-//  public Iterable<ItemStack> getArmorSlots() {return Collections.emptyList();}
-//  public ItemStack getItemBySlot(EquipmentSlot slot) {return ItemStack.EMPTY;}
-//  public HumanoidArm getMainArm() {return null;}
-//  public void setItemSlot(EquipmentSlot equipmentSlot, ItemStack itemStack) {}
-//  public void resetRenderTick() {timeTrigger = tickCount;}
-//
-//  public UUID getBossUUID() {return bossUUID;}
-//	public int getControlFlg1() {return 0;}
-//}

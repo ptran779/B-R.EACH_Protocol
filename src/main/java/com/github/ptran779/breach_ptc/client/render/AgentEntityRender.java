@@ -40,6 +40,10 @@ public class AgentEntityRender extends HumanoidMobRenderer<AbsAgentEntity, Agent
     return agent.getResolvedSkin();
   }
 
+	protected void scale(AbsAgentEntity pLivingEntity, PoseStack pPoseStack, float pPartialTickTime) {
+		pPoseStack.scale(0.9375F, 0.9375F, 0.9375F);
+	}
+
   @Override
   public void render(AbsAgentEntity agent, float pEntityYaw, float partialTicks, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight) {
     this.model = agent.getFemale() ? slimModel : standardModel;
@@ -100,7 +104,15 @@ public class AgentEntityRender extends HumanoidMobRenderer<AbsAgentEntity, Agent
 			model.leftSleeve.copyFrom(model.leftArm);
 			model.rightSleeve.copyFrom(model.rightArm);
 		}
-	  pPoseStack.scale(0.9375F, 0.9375F, 0.9375F);
+
+		// for riding/sitting
+		if (agent.isPassenger()){
+			model.leftLeg.xRot = -1.4f;
+			model.rightLeg.xRot = -1.4f;
+			model.leftPants.xRot = -1.4f;
+			model.rightPants.xRot = -1.4f;
+		}
+
     super.render(agent, pEntityYaw, partialTicks, pPoseStack, pBuffer, pPackedLight);
   }
 }

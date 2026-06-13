@@ -215,6 +215,8 @@ public abstract class AbsAgentEntity extends PathfinderMob implements InventoryC
 		entityData.define(GUN_STACK, ItemStack.EMPTY);
 		entityData.define(SPECIAL_STACK, ItemStack.EMPTY);
 	}
+	protected float getStandingEyeHeight(Pose pPose, EntityDimensions pSize) {return 1.62F;}
+	public double getMyRidingOffset() {return -0.25;}
 
 	public String getAgentType() {return "abstract agent";}
 	public String getOwner() {
@@ -268,7 +270,7 @@ public abstract class AbsAgentEntity extends PathfinderMob implements InventoryC
 
 	public abstract AgentConfig getAgentConfig();
 
-	/// Combat
+	/// Combat handling
 	/// re split gun logic for easier handling and allow rapid firing
 	/// move this to some handler later
 	FireMode fmode = FireMode.UNKNOWN;
@@ -705,7 +707,10 @@ public abstract class AbsAgentEntity extends PathfinderMob implements InventoryC
 		if (item.getItem() instanceof BadgeItem) {return InteractionResult.PASS;}
 
 		if (!this.level().isClientSide) {
-			if (getBossUUID() == null) setBossUUID(player.getUUID());
+			if (getBossUUID() == null) {
+				setBossUUID(player.getUUID());
+				if (isAlly(getTarget())) setTarget(null); // stop shooting your ally
+			}
 			if (sameTeam(player)) {
 				NetworkHooks.openScreen((ServerPlayer) player, this, buf -> buf.writeInt(this.getId()));
 			}

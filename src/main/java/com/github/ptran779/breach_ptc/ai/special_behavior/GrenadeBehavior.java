@@ -1,13 +1,11 @@
 package com.github.ptran779.breach_ptc.ai.special_behavior;
 
 import com.github.ptran779.breach_ptc.ai.api.CoolDownBehavior;
-import com.github.ptran779.breach_ptc.ai.api.ThrottleBehavior;
 import com.github.ptran779.breach_ptc.client.animation.AnimationID;
 import com.github.ptran779.breach_ptc.entity.agent.AbsAgentEntity;
 import com.github.ptran779.breach_ptc.entity.api.EntityUtils;
 import com.github.ptran779.breach_ptc.entity.extra.Grenade;
 import com.github.ptran779.breach_ptc.item.GrenadeItem;
-import com.github.ptran779.breach_ptc.item.VPTerminalItem;
 import com.github.ptran779.breach_ptc.network.PacketHandler;
 import com.github.ptran779.breach_ptc.network.render.EntityRenderPacket;
 import com.github.ptran779.breach_ptc.server.EntityInit;
@@ -20,8 +18,6 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.PacketDistributor;
-
-import static com.github.ptran779.breach_ptc.config.ServerConfig.VP_MIN_TARGET_HEALTH;
 
 public class GrenadeBehavior extends CoolDownBehavior {
 	public final double[] THROW_ANGLES = {0, 15, 30, 45, 60, 75};
@@ -143,6 +139,7 @@ public class GrenadeBehavior extends CoolDownBehavior {
 			Vec3 throwDir = new Vec3(flat.x * Math.cos(Math.toRadians(angleNeeded)), Math.sin(Math.toRadians(angleNeeded)),
 				flat.z * Math.cos(Math.toRadians(angleNeeded))).normalize();
 			Grenade g = new Grenade(EntityInit.GRENADE.get(), agent.level());
+			g.setCaster(agent);
 			g.setPos(agent.getX(), agent.getEyeY() - 0.1, agent.getZ());
 			g.setGrenadeType(((GrenadeItem) agent.getSpecialSlot().getItem()).getGrenadeType());
 			g.setDeltaMovement(throwDir.scale(speedNeeded));

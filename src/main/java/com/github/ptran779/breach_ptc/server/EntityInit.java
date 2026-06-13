@@ -18,25 +18,25 @@ public final class EntityInit {
 
 	/// Combat Agent
 	public static final RegistryObject<EntityType<Soldier>> SOLDIER = ENTITIES.register("soldier",
-		() -> EntityType.Builder.of(Soldier::new, MobCategory.MISC)
+		() -> EntityType.Builder.of(Soldier::new, MobCategory.MISC).sized(0.6F, 1.8F)
 			.build(new ResourceLocation(BreachPtc.MOD_ID, "soldier").toString()));
 	public static final RegistryObject<EntityType<Sniper>> SNIPER = ENTITIES.register("sniper",
-		() -> EntityType.Builder.of(Sniper::new, MobCategory.MISC)
+		() -> EntityType.Builder.of(Sniper::new, MobCategory.MISC).sized(0.6F, 1.8F)
 			.build(new ResourceLocation(BreachPtc.MOD_ID, "sniper").toString()));
 	public static final RegistryObject<EntityType<Heavy>> HEAVY = ENTITIES.register("heavy",
-		() -> EntityType.Builder.of(Heavy::new, MobCategory.MISC)
+		() -> EntityType.Builder.of(Heavy::new, MobCategory.MISC).sized(0.6F, 1.8F)
 			.build(new ResourceLocation(BreachPtc.MOD_ID, "heavy").toString()));
 	public static final RegistryObject<EntityType<Demolition>> DEMOLITION = ENTITIES.register("demolition",
-		() -> EntityType.Builder.of(Demolition::new, MobCategory.MISC)
+		() -> EntityType.Builder.of(Demolition::new, MobCategory.MISC).sized(0.6F, 1.8F)
 			.build(new ResourceLocation(BreachPtc.MOD_ID, "demolition").toString()));
 	public static final RegistryObject<EntityType<Medic>> MEDIC = ENTITIES.register("medic",
-		() -> EntityType.Builder.of(Medic::new, MobCategory.MISC)
+		() -> EntityType.Builder.of(Medic::new, MobCategory.MISC).sized(0.6F, 1.8F)
 			.build(new ResourceLocation(BreachPtc.MOD_ID, "medic").toString()));
 	public static final RegistryObject<EntityType<Engineer>> ENGINEER = ENTITIES.register("engineer",
-		() -> EntityType.Builder.of(Engineer::new, MobCategory.MISC)
+		() -> EntityType.Builder.of(Engineer::new, MobCategory.MISC).sized(0.6F, 1.8F)
 			.build(new ResourceLocation(BreachPtc.MOD_ID, "engineer").toString()));
 	public static final RegistryObject<EntityType<Swordman>> SWORDMAN = ENTITIES.register("swordman",
-		() -> EntityType.Builder.of(Swordman::new, MobCategory.MISC)
+		() -> EntityType.Builder.of(Swordman::new, MobCategory.MISC).sized(0.6F, 1.8F)
 			.build(new ResourceLocation(BreachPtc.MOD_ID, "swordman").toString()));
 
 	/// vehicle

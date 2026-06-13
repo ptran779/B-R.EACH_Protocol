@@ -63,7 +63,7 @@ public class AgentCosmeticLayer extends RenderLayer<AbsAgentEntity, AgentModel> 
 			pose.pushPose();
 
 			this.getParentModel().body.translateAndRotate(pose);
-			pose.translate(-0.2D, 0.40D, 0.3D);
+			pose.translate(-0.22D, 0.40D, 0.22D);
 			pose.mulPose(Axis.ZP.rotationDegrees(-110f));  // The "Tactical Slant"
 			pose.mulPose(Axis.YP.rotationDegrees(90f));  // Face the right way
 			pose.mulPose(Axis.XP.rotationDegrees(10f)); // Flip upright
@@ -80,7 +80,7 @@ public class AgentCosmeticLayer extends RenderLayer<AbsAgentEntity, AgentModel> 
 				special.getItem() != agent.getOffhandItem().getItem()
 		)) {
 			pose.pushPose();
-			pose.translate(-.1D, .6D, 0.2D);
+			pose.translate(-.1D, .6D, 0.1D);
 			pose.mulPose(Axis.YP.rotationDegrees(-30f));
 			pose.mulPose(Axis.ZP.rotationDegrees(180f));
 			pose.scale(0.7F, 0.7F, 0.7F);

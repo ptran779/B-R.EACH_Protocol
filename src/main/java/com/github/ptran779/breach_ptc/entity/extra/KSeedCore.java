@@ -65,10 +65,10 @@ public class KSeedCore extends LivingEntity {
 					// Invisibility pulse every 2 seconds
 					if (tickCount % 40 == 0) {
 						rider.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 60, 0, false, false));
-						rider.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING,    60, 3, false, false));
-						rider.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 60, 4, false, false));
-						rider.addEffect(new MobEffectInstance(MobEffects.REGENERATION,    60, 2, false, false));
-						rider.addEffect(new MobEffectInstance(MobEffects.ABSORPTION,      60, 3, false, false));
+						rider.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING,    60, 5, false, false));
+						rider.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 60, 5, false, false));
+						rider.addEffect(new MobEffectInstance(MobEffects.REGENERATION,    60, 5, false, false));
+						rider.addEffect(new MobEffectInstance(MobEffects.ABSORPTION,      60, 10, false, false));
 						rider.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 60, 0, false, false));
 					}
 				}

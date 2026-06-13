@@ -20,6 +20,7 @@ import net.minecraft.world.phys.AABB;
 import static com.github.ptran779.breach_ptc.server.EffectInit.*;
 
 public class Grenade extends Entity {
+	protected Entity source;
 	public static final float GRAVITY = -0.04f;
 	protected int fuseTick = 60;
 	public boolean landed = false;
@@ -30,7 +31,7 @@ public class Grenade extends Entity {
 		super(pEntityType, pLevel);
 	}
 
-	public void setFuseTick(int fuseTick) {this.fuseTick = fuseTick;}
+	public void setCaster(Entity source) {this.source = source;}
 
 	protected void defineSynchedData() {
 		this.entityData.define(DATA_TYPE_ID, GrenadeType.FRAG.ordinal());
@@ -101,7 +102,7 @@ public class Grenade extends Entity {
 	}
 
 	private void fragBoom() {
-		level().explode(this, this.getX(), this.getY(), this.getZ(), 4.0F, Level.ExplosionInteraction.NONE);
+		level().explode(source, this.getX(), this.getY(), this.getZ(), 4.0F, Level.ExplosionInteraction.NONE);
 		ServerLevel serverLevel = (ServerLevel) level();
 		serverLevel.sendParticles(ParticleTypes.SMOKE, this.getX(), this.getY(), this.getZ(), 100, 3.0, 2.0, 3.0, 0.15);
 	}

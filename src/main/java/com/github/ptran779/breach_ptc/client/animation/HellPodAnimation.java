@@ -1,6 +1,5 @@
 package com.github.ptran779.breach_ptc.client.animation;// Save this class in your mod and generate all required imports
 
-import com.tacz.guns.client.resource.pojo.animation.gltf.Animation;
 import net.minecraft.client.animation.AnimationChannel;
 import net.minecraft.client.animation.AnimationDefinition;
 import net.minecraft.client.animation.Keyframe;
@@ -11,7 +10,7 @@ import net.minecraft.client.animation.KeyframeAnimations;
  * Exported for Minecraft version 1.19 or later with Mojang mappings
  * @author Author
  */
-public class HellPodAnimation extends Animation {
+public class HellPodAnimation{
 	public static final AnimationDefinition DEPLOY1 = AnimationDefinition.Builder.withLength(0.5F)
 			.addAnimation("n1", new AnimationChannel(AnimationChannel.Targets.ROTATION,
 					new Keyframe(0.0F, KeyframeAnimations.degreeVec(67.5F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),

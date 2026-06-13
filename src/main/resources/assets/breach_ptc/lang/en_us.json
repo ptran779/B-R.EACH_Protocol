@@ -47,5 +47,10 @@
   "key.category.breach_ptc.breach_ptc": "B-R.EACH Controls",
   "key.category.breach_ptc.follow_mode": "Toggle Follow Mode",
   "key.category.breach_ptc.target_mode": "Toggle Target Mode",
-  "key.category.breach_ptc.special_mode": "Activate Special Ability"
+  "key.category.breach_ptc.special_mode": "Activate Special Ability",
+
+  "effect.breach_prc.corrosive_sludge": "Corrosive Sludge",
+  "effect.breach_prc.emp_disruptor": "EMP Disruptor",
+  "effect.breach_prc.thermal_bleed": "Thermal Bleed",
+  "effect.breach_prc.flash_bang": "Flash Bang"
 }

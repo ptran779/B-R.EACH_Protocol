@@ -5,6 +5,7 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 
 public class ServerConfig {
+	public static ForgeConfigSpec.BooleanValue PLAYER_DROP_POD;
 	public static ForgeConfigSpec.DoubleValue BD_TURRET_DPS;
 	public static ForgeConfigSpec.IntValue BD_TURRET_CHARGE_MAX;
 	public static ForgeConfigSpec.IntValue PORT_DIS_CHARGE_MAX;
@@ -23,15 +24,15 @@ public class ServerConfig {
 
 	private static void registerCommonConfig() {
 		ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
-		builder.comment("Drop Pod Settings").push("droppod");
+		builder.comment("Player Settings").push("player");
+		PLAYER_DROP_POD = builder.comment("Should first time player join in enter in droppod?").define("PlayerDropPod", true);
+		builder.pop();
 
 		builder.comment("Structure Settings").push("structure");
 		BD_TURRET_DPS =
 			builder.comment("Double Barrel Bullet Damage per shot").defineInRange("BDTurretDps", 6f, 0f, Float.MAX_VALUE);
-
 		BD_TURRET_CHARGE_MAX =
 			builder.comment("Double Barrel Bullet Max Charge").defineInRange("BDTurretChargeMax", 100, 0, Integer.MAX_VALUE);
-
 		PORT_DIS_CHARGE_MAX =
 			builder.comment("Portable Dispenser Max Charge").defineInRange("PortDisMaxCharge", 200, 0, Integer.MAX_VALUE);
 		builder.pop();
@@ -46,7 +47,7 @@ public class ServerConfig {
 		BANDAGE_HEALTH_REFILL = builder.comment("How much health can bandage restore")
 			.defineInRange("BandageRestoreAmount", 6, 0, Integer.MAX_VALUE);
 
-		builder.comment("grenade usage for goal system").push("agent");
+		builder.comment("grenade usage for goal system").push("grenade_condition");
 		GRENADE_FRAG_CLUSTER = builder.comment(
 				"How many entity needed within the target enemy cluster to throw the frag?")
 			.defineInRange("EnemyClusterFrag", 4, 0, Integer.MAX_VALUE);

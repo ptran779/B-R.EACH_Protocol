@@ -16,8 +16,7 @@ import static net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED
 
 public class DronePursudeGoal extends Goal {
   VectorPursuer vp;
-  LivingEntity tPursude;
-  LivingEntity tBoss;
+  LivingEntity mainTarget;
   boolean lockOn = false;
 	double explodingRQ;
 
@@ -30,36 +29,31 @@ public class DronePursudeGoal extends Goal {
   }
   public void start() {
     if (vp.getTarget() != null && vp.getTarget().isAlive()) {
-			tPursude = vp.getTarget();
-			explodingRQ = tPursude.getBoundingBox().getSize() * tPursude.getBoundingBox().getSize()+1;  // easier to kill
+			mainTarget = vp.getTarget();
+			explodingRQ = mainTarget.getBoundingBox().getSize() * mainTarget.getBoundingBox().getSize()+1;  // easier to kill
 	    // small thing
 		}
-    if (vp.deployerUUID != null) {
-      Entity e = ((ServerLevel)vp.level()).getEntity(vp.deployerUUID);
-      if (e instanceof LivingEntity livingEntity) {tBoss = livingEntity;}
-    }
-
   }
 
   public boolean requiresUpdateEveryTick() {return true;}
   public void tick() {
-    if (tPursude != null && tPursude.isAlive()) {
-      double distSqr = vp.distanceToSqr(tPursude);
-      if (!lockOn && distSqr < 144 && vp.getSensing().hasLineOfSight(tPursude)) {lockOn = true;}
-      vp.getLookControl().setLookAt(tPursude, 30.0F, 30.0F);
+    if (mainTarget != null && mainTarget.isAlive()) {
+      double distSqr = vp.distanceToSqr(mainTarget);
+      if (!lockOn && distSqr < 144 && vp.getSensing().hasLineOfSight(mainTarget)) {lockOn = true;}
+      vp.getLookControl().setLookAt(mainTarget, 30.0F, 30.0F);
       if (lockOn && vp.tickCount % 4 == 0) {
         Vec3 viewVec = vp.getLookAngle(); // already normalized
         vp.setDeltaMovement(viewVec.scale(0.75)); // adjust speed
         if (distSqr <= explodingRQ) {
-          vp.level().explode(vp, vp.getX(), vp.getY(), vp.getZ(), 4.0f, Level.ExplosionInteraction.NONE );
+          vp.level().explode(vp.deployer, vp.getX(), vp.getY(), vp.getZ(), 4.0f, Level.ExplosionInteraction.NONE);
           vp.discard();
         }
       } else {
-        vp.getNavigation().moveTo(tPursude, vp.getAttributeValue(FLYING_SPEED));
+        vp.getNavigation().moveTo(mainTarget, vp.getAttributeValue(FLYING_SPEED));
       }
-    } else if (tBoss != null) {
-      if (vp.distanceToSqr(tBoss) <= 2) {dropItems();}
-      vp.getNavigation().moveTo(tBoss, vp.getAttributeValue(MOVEMENT_SPEED));
+    } else if (vp.deployer != null) {
+      if (vp.distanceToSqr(vp.deployer) <= 2) {dropItems();}
+      vp.getNavigation().moveTo(vp.deployer, vp.getAttributeValue(MOVEMENT_SPEED));
     } else {dropItems();}
   }
   protected void dropItems() {

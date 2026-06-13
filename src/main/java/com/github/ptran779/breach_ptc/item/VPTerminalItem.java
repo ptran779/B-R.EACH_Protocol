@@ -41,7 +41,7 @@ public class VPTerminalItem extends Item {
 			Vec3 spawnPos = player.position().add(player.getLookAngle().scale(1.5));
 			drone.setPos(spawnPos.x, spawnPos.y + 1, spawnPos.z);
 
-			drone.deployerUUID = player.getUUID();
+			drone.deployer = player;
 			drone.setTarget(findHighestHealthTarget(player));  // drone needs manual target set
 			level.addFreshEntity(drone);
 

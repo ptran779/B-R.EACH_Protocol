@@ -65,11 +65,12 @@ public class DeployVPBehavior extends CoolDownBehavior {
 		} else if (dummy == 30) {
 			resetActionCoolDown();
 			VectorPursuer drone = new VectorPursuer(EntityInit.VECTOR_PURSUER.get(), agent.level());
+			drone.bossUUID = agent.getBossUUID();
 			agent.level().playSound(null, agent.getX(), agent.getY(), agent.getZ(), SoundEvents.NOTE_BLOCK_BIT.value(),
 				SoundSource.PLAYERS, 1.0F, 1.25F);
 
 			drone.setPos(agent.getX(), agent.getY() + 1, agent.getZ());
-			drone.deployerUUID = agent.getUUID();
+			drone.deployer = agent;
 			drone.setTarget(target);
 			agent.level().addFreshEntity(drone);
 			agent.getSpecialSlot().shrink(1);

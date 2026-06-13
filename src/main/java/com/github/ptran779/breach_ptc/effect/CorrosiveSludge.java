@@ -2,6 +2,7 @@ package com.github.ptran779.breach_ptc.effect;
 
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -30,6 +31,9 @@ public class CorrosiveSludge extends MobEffect {
 				});
 			}
 		}
+		// purge resistance
+		entity.removeEffect(MobEffects.DAMAGE_RESISTANCE);  // im tired of some dumbass mod give entity resistance 5 for
+		// no good damn reason. Fuck that
 
 		// The Visual: Toxic splashing
 		if (entity.level().isClientSide()) {
